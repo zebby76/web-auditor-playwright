@@ -14,13 +14,71 @@ npm start
 docker build -t elasticms/web-auditor .
 
 docker run --rm \
-  -e START_URL="https://ton-site.be" \
+  -e START_URL="https://your-site.com" \
   -e MAX_PAGES="80" \
-  -e MAX_DEPTH="4" \
+  -e MAX_DEPTH="15" \
   -e CONCURRENCY="2" \
   -e CHECK_EXTERNAL_LINKS="false" \
   elasticms/web-auditor
 ```
+
+## Environment Variables
+
+The crawler can be configured using environment variables.  
+These variables control crawl behavior, performance limits, and execution parameters.
+
+You can define them directly in the shell, in a `.env` file, or via Docker environment variables.
+
+Example:
+```bash
+START_URL=https://your-site.com \
+MAX_PAGES=100 \
+CONCURRENCY=3 \
+RATE_LIMIT_MS=500 \
+npm start
+```
+
+| Variable               | Default               | Description                                                                                                                 |
+| ---------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `START_URL`            | `https://example.org` | The initial URL where the crawler starts. All discovered pages will be crawled starting from this entry point.              |
+| `MAX_PAGES`            | `50`                  | Maximum number of pages the crawler will visit before stopping.                                                             |
+| `MAX_DEPTH`            | `3`                   | Maximum crawl depth starting from the `START_URL`. Depth `0` is the start page.                                             |
+| `CONCURRENCY`          | `3`                   | Maximum number of pages processed in parallel. Increasing this value speeds up crawling but increases CPU and memory usage. |
+| `RATE_LIMIT_MS`        | `500`                 | Minimum delay (in milliseconds) between navigation requests. This helps avoid overloading the target server.                |
+| `NAV_TIMEOUT_MS`       | `30000`               | Maximum time (in milliseconds) allowed for page navigation before it is considered a failure.                               |
+| `SAME_ORIGIN_ONLY`     | `true`                | If enabled, the crawler only follows links that belong to the same origin as the `START_URL`.                               |
+| `CHECK_EXTERNAL_LINKS` | `false`               | If enabled, dead link detection will also test external links. Otherwise only internal links are checked.                   |
+| `LH_EVERY_N`           | `10`                  | Run a Lighthouse audit every N HTML pages visited.                                                                          |
+
+## Performance Tuning
+
+These parameters are the most important for controlling crawler performance:
+
+### Concurrency
+
+`CONCURRENCY` controls how many pages are processed simultaneously.
+
+Typical values:
+
+| Value | Use Case                                             |
+| ----- | ---------------------------------------------------- |
+| `1`   | Debugging                                            |
+| `2-3` | Safe crawling                                        |
+| `5`   | Faster crawl                                         |
+| `10+` | High-performance crawling (requires strong hardware) |
+
+### Rate Limiting
+
+`RATE_LIMIT_MS` defines the minimum delay between navigation requests.
+
+Examples:
+
+| Value  | Behavior          |
+| ------ | ----------------- |
+| `0`    | No rate limiting  |
+| `200`  | Fast crawl        |
+| `500`  | Balanced          |
+| `1000` | Very polite crawl |
 
 ## Code Formatting and Linting
 
