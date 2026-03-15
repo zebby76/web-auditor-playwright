@@ -6,9 +6,18 @@ import { CrawlerEngine } from "./engine/CrawlerEngine.js";
 // import { DeadLinksPlugin } from "./plugins/DeadLinksPlugin";
 // import { PdfTextractPlugin } from "./plugins/PdfTextractPlugin";
 // import { LighthouseEveryNHtmlPlugin } from "./plugins/LighthouseEveryNHtmlPlugin";
+import { StatsCollectorPlugin } from "./plugins/StatsCollectorPlugin.js";
+import { ConsoleStatusPlugin } from "./plugins/ConsoleStatusPlugin.js";
 
 async function main() {
-  const registry = new PluginRegistry();
+  const registry = new PluginRegistry()
+    .register(new StatsCollectorPlugin({ rollingWindowSize: 12 }))
+    .register(
+      new ConsoleStatusPlugin({
+        refreshEveryMs: 2000,
+        singleLine: true,
+      }),
+    );
   // .register(new ConsoleErrorsPlugin())
   // .register(new A11yAxePlugin())
   // .register(new DeadLinksPlugin({ checkExternal: (process.env.CHECK_EXTERNAL_LINKS ?? "false") === "true" }))

@@ -1,4 +1,4 @@
-import { chromium, type Page, type ConsoleMessage } from "playwright";
+import { chromium, type ConsoleMessage } from "playwright";
 import type { CrawlOptions, ResourceContext, EngineState } from "./types.js";
 import { PluginRegistry } from "./PluginRegistry.js";
 import { normalizeUrl, parseMime, kindFromMime, isSameOrigin } from "./utils.js";
@@ -23,6 +23,12 @@ export class CrawlerEngine {
       origin,
       seen: new Set([start]),
       htmlVisitedCount: 0,
+      processedCount: 0,
+      successCount: 0,
+      errorCount: 0,
+      queueSize: 1,
+      activeWorkers: 0,
+      maxPages: this.opts.maxPages,
       any: {},
     };
 
@@ -35,6 +41,9 @@ export class CrawlerEngine {
     });
 
     const processOne = async (item: { url: string; depth: number }) => {
+      state.activeWorkers += 1;
+      state.queueSize = queue.length;
+
       const page = await context.newPage();
       page.setDefaultNavigationTimeout(this.opts.navTimeoutMs);
 
@@ -126,14 +135,24 @@ export class CrawlerEngine {
           ctx.pdfBuffer = body ? Buffer.from(body) : undefined;
         }
 
+        state.queueSize = queue.length;
+
         await this.registry.runPhase("afterExtract", ctx);
 
         // plugins de “process”
         await this.registry.runPhase("afterProcess", ctx);
 
+        const hasErrorFinding = ctx.findings.some((f) => f.type === "error");
+        if (hasErrorFinding) {
+          state.errorCount += 1;
+        } else {
+          state.successCount += 1;
+        }
+
         // phase périodique (plugins peuvent décider via engineState)
         await this.registry.runPhase("periodic", ctx);
       } catch (e: unknown) {
+        state.errorCount += 1;
         let errorMessage = "Unknown error: " + String(e);
         if (e instanceof Error) {
           errorMessage = e.message;
@@ -146,6 +165,10 @@ export class CrawlerEngine {
           url: ctx.url,
         });
       } finally {
+        state.processedCount += 1;
+        state.queueSize = queue.length;
+        state.activeWorkers -= 1;
+
         results.push(ctx);
         await page.close();
       }
@@ -161,8 +184,11 @@ export class CrawlerEngine {
       ) {
         batch.push(queue.shift()!);
       }
+
+      state.queueSize = queue.length;
       await Promise.all(batch.map(processOne));
       visited += batch.length;
+      state.queueSize = queue.length;
     }
 
     await context.close();

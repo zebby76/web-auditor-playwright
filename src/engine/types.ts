@@ -48,11 +48,19 @@ export type ResourceContext = {
   findings: Finding[];
 };
 
+export type FindingData = Record<string, unknown>;
+
 export type EngineState = {
   startedAt: string;
   origin: string;
   seen: Set<string>;
   htmlVisitedCount: number;
+  processedCount: number;
+  successCount: number;
+  errorCount: number;
+  queueSize: number;
+  activeWorkers: number;
+  maxPages: number;
   any: Record<string, unknown>;
 };
 
@@ -62,7 +70,7 @@ export type Finding = {
   code: string;
   message: string;
   url: string;
-  data?: string;
+  data?: FindingData;
 };
 
 export type PluginPhase = "beforeGoto" | "afterGoto" | "afterExtract" | "afterProcess" | "periodic";
