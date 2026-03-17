@@ -110,7 +110,13 @@ export type Finding = {
     data?: FindingData;
 };
 
-export type PluginPhase = "beforeGoto" | "afterGoto" | "afterExtract" | "afterProcess" | "periodic";
+export type PluginPhase =
+    | "beforeGoto"
+    | "afterGoto"
+    | "afterExtract"
+    | "afterProcess"
+    | "periodic"
+    | "finally";
 
 export interface IPlugin {
     name: string;

@@ -10,7 +10,7 @@ type PerUrlJsonReportPluginOptions = {
 
 export class PerUrlJsonReportPlugin implements IPlugin {
     name = "per-url-json-report";
-    phases: PluginPhase[] = ["periodic"];
+    phases: PluginPhase[] = ["finally"];
 
     constructor(private readonly options: PerUrlJsonReportPluginOptions) {}
 

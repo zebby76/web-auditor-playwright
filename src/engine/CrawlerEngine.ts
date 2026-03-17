@@ -191,6 +191,7 @@ export class CrawlerEngine {
 
                 results.push(ctx);
                 await page.close();
+                await this.registry.runPhase("finally", ctx);
             }
         };
 
