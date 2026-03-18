@@ -67,7 +67,6 @@ export class CrawlerEngine {
             });
             page.on("pageerror", (err) => pageErrors.push(err.message));
 
-            // contexte minimal avant navigation
             const ctx: ResourceContext = {
                 url: item.url,
                 depth: item.depth,
@@ -91,10 +90,8 @@ export class CrawlerEngine {
                 .catch(() => null);
 
             try {
-                await this.registry.runPhase("beforeGoto", ctx);
-
-                // Rate limit global avant toute navigation
                 await this.rateLimiter.wait();
+                await this.registry.runPhase("beforeGoto", ctx);
 
                 const response = await page.goto(item.url, { waitUntil: "domcontentloaded" });
                 ctx.response = response ?? undefined;
@@ -118,17 +115,16 @@ export class CrawlerEngine {
 
                 await this.registry.runPhase("afterGoto", ctx);
 
-                // Extraction brute selon kind
-                if (ctx.kind === "html") {
+                if (ctx.kind === "unknown") {
+                    await this.registry.runPhase("unknown", ctx);
+                } else if (ctx.kind === "html") {
                     ctx.html = await page.content();
 
-                    // liens (utile crawl + deadlinks)
                     const hrefs: string[] = await page.$$eval("a[href]", (as) =>
                         as.map((a) => (a as HTMLAnchorElement).href).filter(Boolean),
                     );
                     ctx.links = hrefs;
 
-                    // enqueue
                     for (const h of hrefs) {
                         let n: string;
                         try {
@@ -150,23 +146,24 @@ export class CrawlerEngine {
                         state.seen.add(n);
                         queue.push({ url: n, depth: item.depth + 1 });
                     }
-
+                    await this.registry.runPhase("html", ctx);
                     state.htmlVisitedCount += 1;
                 } else if (ctx.kind === "pdf") {
                     // récupérer le buffer PDF
                     // IMPORTANT: response.body() marche si Playwright a la réponse; sinon fallback via fetch page.request
                     const body = response ? await response.body() : undefined;
                     ctx.pdfBuffer = body ? Buffer.from(body) : undefined;
+                    await this.registry.runPhase("pdf", ctx);
+                } else {
+                    await this.registry.runPhase("other", ctx);
                 }
 
                 state.queueSize = queue.length;
 
                 await this.registry.runPhase("afterExtract", ctx);
 
-                // plugins de “process”
                 await this.registry.runPhase("afterProcess", ctx);
 
-                // phase périodique (plugins peuvent décider via engineState)
                 await this.registry.runPhase("periodic", ctx);
             } catch (e: unknown) {
                 const download = await downloadPromise;
@@ -185,6 +182,7 @@ export class CrawlerEngine {
                         message: errorMessage,
                         url: ctx.url,
                     });
+                    await this.registry.runPhase("error", ctx);
                 }
             } finally {
                 const hasErrorFinding = ctx.findings.some((f) => f.type === "error");

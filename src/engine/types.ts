@@ -114,10 +114,15 @@ export type Finding = {
 export type PluginPhase =
     | "beforeGoto"
     | "afterGoto"
+    | "unknown"
+    | "pdf"
+    | "html"
+    | "other"
     | "afterExtract"
     | "afterProcess"
     | "periodic"
     | "download"
+    | "error"
     | "finally";
 
 export interface IPlugin {
