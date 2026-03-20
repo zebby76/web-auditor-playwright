@@ -62,6 +62,7 @@ async function main() {
     pluginSummaries.push({
         plugin: "engine",
         auditedUrls: state.seen.size,
+        infos: state.infoCount,
         errors: state.errorCount,
         warnings: state.warningCount,
     });

@@ -31,8 +31,9 @@ export class CrawlerEngine {
             seen: new Set(),
             processedCount: 0,
             successCount: 0,
-            errorCount: 0,
+            infoCount: 0,
             warningCount: 0,
+            errorCount: 0,
             queueSize: 1,
             activeWorkers: 0,
             maxPages: this.opts.maxPages,
@@ -176,6 +177,9 @@ export class CrawlerEngine {
                     await this.registry.runPhase("error", ctx);
                 }
             } finally {
+                if (ctx.findings.some((f) => f.type === "info")) {
+                    state.infoCount += 1;
+                }
                 if (ctx.findings.some((f) => f.type === "warning")) {
                     state.warningCount += 1;
                 }

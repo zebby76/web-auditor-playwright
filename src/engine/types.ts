@@ -102,8 +102,9 @@ export type EngineState = {
     seen: Set<string>;
     processedCount: number;
     successCount: number;
-    errorCount: number;
+    infoCount: number;
     warningCount: number;
+    errorCount: number;
     queueSize: number;
     activeWorkers: number;
     maxPages: number;
@@ -130,6 +131,7 @@ export type PluginPhase =
 export type PluginSummary = {
     plugin: string;
     auditedUrls: number;
+    infos: number;
     warnings: number;
     errors: number;
 };
