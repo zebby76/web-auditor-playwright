@@ -72,6 +72,7 @@ export type ResourceReport = {
     meta_title: string | null;
     title: string | null;
     locale: string | null;
+    description: string | null;
     links: ResourceReportLink[];
     pa11y: ResourceReportPa11yItem[];
     data: Record<string, unknown>;

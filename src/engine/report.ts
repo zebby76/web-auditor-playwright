@@ -19,5 +19,6 @@ export function createInitialReport(
         links: [],
         pa11y: [],
         data: {},
+        description: null,
     };
 }

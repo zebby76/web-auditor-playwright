@@ -28,6 +28,13 @@ export class ProcessHtmlPlugin implements IPlugin {
                 .map((el) => el.textContent?.trim() ?? "")
                 .filter((t) => t.length > 0);
 
+            const getMeta = (selector: string) =>
+                document.querySelector(selector)?.getAttribute("content") ?? null;
+            const description =
+                getMeta('meta[name="description"]') ||
+                getMeta('meta[property="og:description"]') ||
+                getMeta('meta[name="twitter:description"]');
+
             const elements = Array.from(document.querySelectorAll("[href], [src]"));
             const links: ResourceReportLink[] = [];
 
@@ -53,6 +60,7 @@ export class ProcessHtmlPlugin implements IPlugin {
             return {
                 title,
                 h1s,
+                description,
                 links,
                 lang,
             };
@@ -61,6 +69,7 @@ export class ProcessHtmlPlugin implements IPlugin {
         ctx.report.is_web = true;
         ctx.report.meta_title = extracted.title;
         ctx.report.locale = extracted.lang;
+        ctx.report.description = extracted.description;
         ctx.report.title = extracted.h1s.length > 0 ? extracted.h1s[0] : null;
         ctx.report.links = this.maxLinksPerPage
             ? extracted.links.slice(0, this.maxLinksPerPage)
