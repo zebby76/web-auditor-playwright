@@ -1,6 +1,6 @@
 import { IPlugin, PluginPhase, ResourceContext, ResourceReportLink } from "../engine/types.js";
 import { BasePlugin } from "../engine/BasePlugin.js";
-import { TitleAnalyzer, TitleIssueSeverity } from "../utils/TitleAnalyzer.js";
+import { TitleAnalyzer } from "../utils/TitleAnalyzer.js";
 
 type ProcessHtmlPluginOptions = {
     maxLinksPerPage?: number;
