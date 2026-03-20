@@ -20,5 +20,6 @@ export function createInitialReport(
         pa11y: [],
         data: {},
         description: null,
+        findings: [],
     };
 }

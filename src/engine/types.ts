@@ -34,12 +34,8 @@ export type ResourceContext = {
     extractedText?: string; // ex: textract PDF
 
     report: ResourceReport;
-
     crawler: CrawlerControl;
-    // shared state
     engineState: EngineState;
-
-    // reporting
     findings: Finding[];
 };
 
@@ -76,6 +72,7 @@ export type ResourceReport = {
     links: ResourceReportLink[];
     pa11y: ResourceReportPa11yItem[];
     data: Record<string, unknown>;
+    findings: Finding[];
 };
 
 export type EnqueueRequest = {
