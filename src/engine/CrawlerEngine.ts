@@ -1,5 +1,11 @@
 import { chromium, type ConsoleMessage } from "playwright";
-import type { CrawlOptions, ResourceContext, EngineState } from "./types.js";
+import type {
+    CrawlOptions,
+    EngineState,
+    EnqueueRequest,
+    EnqueueResult,
+    ResourceContext,
+} from "./types.js";
 import { PluginRegistry } from "./PluginRegistry.js";
 import { normalizeUrl, parseMime, kindFromMime, isSameOrigin } from "./utils.js";
 import { RateLimiter } from "./RateLimiter.js";
@@ -22,7 +28,7 @@ export class CrawlerEngine {
         const state: EngineState = {
             startedAt: new Date().toISOString(),
             origin,
-            seen: new Set([start]),
+            seen: new Set(),
             htmlVisitedCount: 0,
             downloadVisitedCount: 0,
             processedCount: 0,
@@ -34,7 +40,9 @@ export class CrawlerEngine {
             any: {},
         };
 
-        const queue: { url: string; depth: number }[] = [{ url: start, depth: 0 }];
+        const queue: { url: string; depth: number }[] = [];
+        this.enqueueUrl({ url: start, depth: 0, source: "engine:start" }, queue, state, start);
+
         const results: ResourceContext[] = [];
 
         const browser = await chromium.launch({ headless: true });
@@ -78,6 +86,20 @@ export class CrawlerEngine {
                 links: [],
                 engineState: state,
                 findings: [],
+                crawler: {
+                    enqueueUrl: (request: EnqueueRequest): EnqueueResult => {
+                        const effectiveDepth = request.depth ?? item.depth + 1;
+                        return this.enqueueUrl(
+                            {
+                                ...request,
+                                depth: effectiveDepth,
+                            },
+                            queue,
+                            state,
+                            start,
+                        );
+                    },
+                },
                 report: createInitialReport({
                     url: item.url,
                     kind: "unknown",
@@ -125,26 +147,11 @@ export class CrawlerEngine {
                     );
                     ctx.links = hrefs;
 
-                    for (const h of hrefs) {
-                        let n: string;
-                        try {
-                            n = normalizeUrl(h);
-                        } catch {
-                            continue;
-                        }
-
-                        if (this.opts.sameOriginOnly && !isSameOrigin(n, start)) {
-                            continue;
-                        }
-                        if (item.depth + 1 > this.opts.maxDepth) {
-                            continue;
-                        }
-                        if (state.seen.has(n)) {
-                            continue;
-                        }
-
-                        state.seen.add(n);
-                        queue.push({ url: n, depth: item.depth + 1 });
+                    for (const href of hrefs) {
+                        ctx.crawler.enqueueUrl({
+                            url: href,
+                            source: "engine:html-links",
+                        });
                     }
                     await this.registry.runPhase("html", ctx);
                     state.htmlVisitedCount += 1;
@@ -222,5 +229,70 @@ export class CrawlerEngine {
         await browser.close();
 
         return { state, results };
+    }
+
+    private enqueueUrl(
+        request: EnqueueRequest,
+        queue: Array<{ url: string; depth: number }>,
+        state: EngineState,
+        startUrl: string,
+    ): EnqueueResult {
+        let normalizedUrl: string;
+
+        try {
+            normalizedUrl = normalizeUrl(request.url);
+        } catch {
+            return {
+                accepted: false,
+                reason: "invalid_url",
+            };
+        }
+
+        const depth = request.depth ?? 0;
+
+        if (depth > this.opts.maxDepth) {
+            return {
+                accepted: false,
+                normalizedUrl,
+                reason: "max_depth_reached",
+            };
+        }
+
+        if (this.opts.sameOriginOnly && !isSameOrigin(normalizedUrl, startUrl)) {
+            return {
+                accepted: false,
+                normalizedUrl,
+                reason: "cross_origin_blocked",
+            };
+        }
+
+        if (state.seen.has(normalizedUrl)) {
+            return {
+                accepted: false,
+                normalizedUrl,
+                reason: "already_seen",
+            };
+        }
+
+        const reservedCount = state.processedCount + queue.length + state.activeWorkers;
+        if (reservedCount >= this.opts.maxPages) {
+            return {
+                accepted: false,
+                normalizedUrl,
+                reason: "max_pages_reached",
+            };
+        }
+
+        state.seen.add(normalizedUrl);
+        queue.push({
+            url: normalizedUrl,
+            depth,
+        });
+        state.queueSize = queue.length;
+
+        return {
+            accepted: true,
+            normalizedUrl,
+        };
     }
 }

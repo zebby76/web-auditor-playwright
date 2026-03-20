@@ -43,6 +43,7 @@ export type ResourceContext = {
 
     report: ResourceReport;
 
+    crawler: CrawlerControl;
     // shared state
     engineState: EngineState;
 
@@ -85,6 +86,27 @@ export type ResourceReport = {
     links: ResourceReportLink[];
     pa11y: ResourceReportPa11yItem[];
     data: Record<string, unknown>;
+};
+
+export type EnqueueRequest = {
+    url: string;
+    depth?: number;
+    source?: string;
+};
+
+export type EnqueueResult = {
+    accepted: boolean;
+    normalizedUrl?: string;
+    reason?:
+        | "invalid_url"
+        | "already_seen"
+        | "max_depth_reached"
+        | "cross_origin_blocked"
+        | "max_pages_reached";
+};
+
+export type CrawlerControl = {
+    enqueueUrl: (request: EnqueueRequest) => EnqueueResult;
 };
 
 export type EngineState = {
