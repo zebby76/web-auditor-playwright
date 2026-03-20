@@ -100,7 +100,6 @@ export type EngineState = {
     startedAt: Date;
     origin: string;
     seen: Set<string>;
-    downloadVisitedCount: number;
     processedCount: number;
     successCount: number;
     errorCount: number;

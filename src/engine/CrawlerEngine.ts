@@ -21,7 +21,7 @@ export class CrawlerEngine {
         this.rateLimiter = new RateLimiter(this.opts.rateLimitMs);
     }
 
-    async run(): Promise<{ state: EngineState; results: ResourceContext[] }> {
+    async run(): Promise<EngineState> {
         const start = normalizeUrl(this.opts.startUrl);
         const origin = new URL(start).origin;
 
@@ -29,7 +29,6 @@ export class CrawlerEngine {
             startedAt: new Date(),
             origin,
             seen: new Set(),
-            downloadVisitedCount: 0,
             processedCount: 0,
             successCount: 0,
             errorCount: 0,
@@ -41,8 +40,6 @@ export class CrawlerEngine {
 
         const queue: { url: string; depth: number }[] = [];
         this.enqueueUrl({ url: start, depth: 0, source: "engine:start" }, queue, state, start);
-
-        const results: ResourceContext[] = [];
 
         const browser = await chromium.launch({ headless: true });
         const context = await browser.newContext({
@@ -139,7 +136,6 @@ export class CrawlerEngine {
             } catch (e: unknown) {
                 const download = await downloadPromise;
                 if (download) {
-                    state.downloadVisitedCount += 1;
                     await this.registry.runPhase("download", ctx);
                 } else {
                     let errorMessage = "Unknown error: " + String(e);
@@ -166,7 +162,6 @@ export class CrawlerEngine {
                 state.queueSize = queue.length;
                 state.activeWorkers -= 1;
 
-                results.push(ctx);
                 await page.close();
                 await this.registry.runPhase("finally", ctx);
                 ctx.report.findings = ctx.findings;
@@ -193,7 +188,7 @@ export class CrawlerEngine {
         await context.close();
         await browser.close();
 
-        return { state, results };
+        return state;
     }
 
     private enqueueUrl(

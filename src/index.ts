@@ -46,7 +46,7 @@ async function main() {
         registry,
     );
 
-    const { state, results } = await engine.run();
+    const state = await engine.run();
 
     const pluginSummaries = registry.getSummaries();
 
@@ -60,16 +60,14 @@ async function main() {
             endedAt: endedAt.toISOString(),
             durationMs: durationMs,
             origin: state.origin,
-            downloadedVisitedCount: state.downloadVisitedCount,
             seenCount: state.seen.size,
         },
-        findings: results.flatMap((r) => r.findings),
         plugins: pluginSummaries,
     };
 
     console.log(JSON.stringify(report, null, 4));
 
-    const hasErrors = report.findings.some((f) => f.type === "error");
+    const hasErrors = pluginSummaries.reduce((sum, p) => sum + p.errors, 0) > 0;
     process.exit(hasErrors ? 2 : 0);
 }
 
