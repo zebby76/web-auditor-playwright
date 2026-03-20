@@ -7,7 +7,7 @@ import type {
     ResourceContext,
 } from "./types.js";
 import { PluginRegistry } from "./PluginRegistry.js";
-import { normalizeUrl, parseMime, kindFromMime, isSameOrigin } from "./utils.js";
+import { normalizeUrl, parseMime, isSameOrigin } from "./utils.js";
 import { RateLimiter } from "./RateLimiter.js";
 import { createInitialReport } from "./report.js";
 
@@ -78,7 +78,6 @@ export class CrawlerEngine {
             const ctx: ResourceContext = {
                 url: item.url,
                 depth: item.depth,
-                kind: "unknown",
                 page,
                 context,
                 console: consoleLogs,
@@ -102,7 +101,6 @@ export class CrawlerEngine {
                 },
                 report: createInitialReport({
                     url: item.url,
-                    kind: "unknown",
                     status: undefined,
                     mime: undefined,
                 }),
@@ -120,9 +118,7 @@ export class CrawlerEngine {
                 ctx.status = response?.status();
                 ctx.finalUrl = response?.url();
 
-                const mime = parseMime(response?.headers()["content-type"]);
-                ctx.mime = mime;
-                ctx.kind = kindFromMime(mime);
+                ctx.mime = parseMime(response?.headers()["content-type"]);
                 const finalTargetUrl = ctx.finalUrl ?? ctx.url;
                 const parsed = new URL(finalTargetUrl);
                 ctx.report.url = finalTargetUrl;
@@ -130,33 +126,15 @@ export class CrawlerEngine {
                 ctx.report.host = parsed.host;
                 ctx.report.base_url = parsed.pathname;
                 ctx.report.timestamp = new Date().toISOString();
-                ctx.report.is_web = ctx.kind === "html";
                 ctx.report.status_code = ctx.status ?? null;
                 ctx.report.message = ctx.response?.statusText() ?? null;
                 ctx.report.mimetype = response?.headers()["content-type"] ?? ctx.mime ?? null;
 
                 await this.registry.runPhase("afterGoto", ctx);
 
-                if (ctx.kind === "unknown") {
-                    await this.registry.runPhase("unknown", ctx);
-                } else if (ctx.kind === "html") {
-                    await this.registry.runPhase("html", ctx);
-                    state.htmlVisitedCount += 1;
-                } else if (ctx.kind === "pdf") {
-                    // récupérer le buffer PDF
-                    // IMPORTANT: response.body() marche si Playwright a la réponse; sinon fallback via fetch page.request
-                    const body = response ? await response.body() : undefined;
-                    ctx.pdfBuffer = body ? Buffer.from(body) : undefined;
-                    await this.registry.runPhase("pdf", ctx);
-                } else {
-                    await this.registry.runPhase("other", ctx);
-                }
-
                 state.queueSize = queue.length;
 
-                await this.registry.runPhase("afterExtract", ctx);
-
-                await this.registry.runPhase("afterProcess", ctx);
+                await this.registry.runPhase("process", ctx);
 
                 await this.registry.runPhase("periodic", ctx);
             } catch (e: unknown) {

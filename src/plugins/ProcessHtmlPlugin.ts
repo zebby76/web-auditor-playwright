@@ -6,7 +6,7 @@ type ProcessHtmlPluginOptions = {
 
 export class ProcessHtmlPlugin implements IPlugin {
     name = "process-html";
-    phases: PluginPhase[] = ["afterExtract"];
+    phases: PluginPhase[] = ["process"];
 
     private readonly maxLinksPerPage: number | null;
 
@@ -15,10 +15,11 @@ export class ProcessHtmlPlugin implements IPlugin {
     }
 
     applies(ctx: ResourceContext): boolean {
-        return ctx.kind === "html";
+        return undefined !== ctx.mime && ctx.mime.includes("text/html");
     }
 
     async run(_phase: PluginPhase, ctx: ResourceContext): Promise<void> {
+        ctx.report.is_web = true;
         const hrefs: string[] = await ctx.page.$$eval("a[href]", (as) =>
             as.map((a) => (a as HTMLAnchorElement).href).filter(Boolean),
         );

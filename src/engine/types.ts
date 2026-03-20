@@ -13,8 +13,6 @@ export type CrawlOptions = {
     rateLimitMs: number;
 };
 
-export type ResourceKind = "html" | "pdf" | "other" | "unknown";
-
 export type ResourceContext = {
     // identification
     url: string;
@@ -24,16 +22,11 @@ export type ResourceContext = {
     // network
     status?: number;
     mime?: Mime;
-    kind: ResourceKind;
 
     // playwright
     page: Page;
     context: BrowserContext;
     response?: Response;
-
-    // payload (selon kind)
-    html?: string;
-    pdfBuffer?: Buffer;
 
     // signals collected
     console: { type: string; text: string; location?: string }[];
@@ -136,12 +129,7 @@ export type Finding = {
 export type PluginPhase =
     | "beforeGoto"
     | "afterGoto"
-    | "unknown"
-    | "pdf"
-    | "html"
-    | "other"
-    | "afterExtract"
-    | "afterProcess"
+    | "process"
     | "periodic"
     | "download"
     | "error"
@@ -150,7 +138,7 @@ export type PluginPhase =
 export interface IPlugin {
     name: string;
 
-    /** Est-ce que le plugin s'applique à cette ressource ? (mime/kind/url/etc.) */
+    /** Est-ce que le plugin s'applique à cette ressource ? (mime/url/etc.) */
     applies(ctx: ResourceContext): boolean;
 
     /** Phases supportées */

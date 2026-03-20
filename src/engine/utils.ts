@@ -10,13 +10,6 @@ export function parseMime(contentType?: string): string | undefined {
     return contentType.split(";")[0].trim().toLowerCase();
 }
 
-export function kindFromMime(mime?: string) {
-    if (!mime) return "unknown" as const;
-    if (mime.includes("text/html")) return "html" as const;
-    if (mime.includes("application/pdf")) return "pdf" as const;
-    return "other" as const;
-}
-
 export function isSameOrigin(a: string, b: string): boolean {
     return new URL(a).origin === new URL(b).origin;
 }
