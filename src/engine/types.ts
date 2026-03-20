@@ -71,7 +71,6 @@ export type ResourceReport = {
     description: string | null;
     links: ResourceReportLink[];
     pa11y: ResourceReportPa11yItem[];
-    data: Record<string, unknown>;
     findings: Finding[];
 };
 
