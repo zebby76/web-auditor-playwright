@@ -17,7 +17,6 @@ export function createInitialReport(
         title: null,
         locale: null,
         links: [],
-        a11y_axe: [],
         description: null,
         content: null,
         findings: [],

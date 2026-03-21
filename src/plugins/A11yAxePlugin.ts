@@ -28,6 +28,7 @@ export class A11yAxePlugin extends BasePlugin implements IPlugin {
 
     async run(_phase: PluginPhase, ctx: ResourceContext): Promise<void> {
         const result = await new AxeBuilder({ page: ctx.page }).analyze();
+        ctx.report.a11y_axe = [];
 
         for (const violation of result.violations ?? []) {
             if (!violation.tags.some((tag) => this.relevantTags.includes(tag))) {

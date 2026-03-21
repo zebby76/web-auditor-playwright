@@ -83,7 +83,7 @@ export type ResourceReport = {
     description: string | null;
     content: string | null;
     links: ResourceReportLink[];
-    a11y_axe: ResourceReportA11yAxeItem[];
+    a11y_axe?: ResourceReportA11yAxeItem[];
     findings: Finding[];
     size: number | null;
 };
