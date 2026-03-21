@@ -16,7 +16,21 @@ export class PluginRegistry {
         const eligible = this.plugins.filter((p) => p.phases.includes(phase) && p.applies(ctx));
 
         for (const p of eligible) {
-            await p.run(phase, ctx);
+            try {
+                await p.run(phase, ctx);
+            } catch (e) {
+                let errorMessage = "Unknown error: " + String(e);
+                if (e instanceof Error) {
+                    errorMessage = e.message;
+                }
+                ctx.findings.push({
+                    plugin: p.name,
+                    type: "error",
+                    code: "UNEXPECTED_ERROR",
+                    message: errorMessage,
+                    url: ctx.url,
+                });
+            }
         }
     }
 
