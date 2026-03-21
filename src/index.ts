@@ -9,6 +9,7 @@ import { PerUrlJsonReportPlugin } from "./plugins/PerUrlJsonReportPlugin.js";
 import { ProcessHtmlPlugin } from "./plugins/ProcessHtmlPlugin.js";
 import { DownloaderPlugin } from "./plugins/DownloaderPlugin.js";
 import { CleanDownloadedPlugin } from "./plugins/CleanDownloadedPlugin.js";
+import { TextDownloadedExtractorPlugin } from "./plugins/TextDownloadedExtractorPlugin.js";
 import { printPluginSummaryTable } from "./engine/summaryPrinter.js";
 
 async function main() {
@@ -42,6 +43,16 @@ async function main() {
                     .filter(Boolean),
             }),
         )
+        .register(
+            new TextDownloadedExtractorPlugin({
+                maxExtractedChars: Number(process.env.DOWNLOAD_MAX_EXTRACTED_CHARS ?? 200000),
+                maxLinks: Number(process.env.DOWNLOAD_MAX_LINKS ?? 500),
+                maxFileSizeBytes: Number(
+                    process.env.DOWNLOAD_MAX_TEXT_READ_BYTES ?? 5 * 1024 * 1024,
+                ),
+            }),
+        )
+        // Low priority plugins
         .register(new CleanDownloadedPlugin());
 
     const outputFormat = process.env.OUTPUT_FORMAT ?? "both";
