@@ -1,4 +1,10 @@
-import { IPlugin, PluginPhase, ResourceContext, ResourceReportLink } from "../engine/types.js";
+import {
+    FindingSeverity,
+    IPlugin,
+    PluginPhase,
+    ResourceContext,
+    ResourceReportLink,
+} from "../engine/types.js";
 import { BasePlugin } from "../engine/BasePlugin.js";
 import { TitleAnalyzer } from "../utils/TitleAnalyzer.js";
 
@@ -71,10 +77,9 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
     }
 
     private async extractFromDom(ctx: ResourceContext) {
-        return ctx.page.evaluate(() => {
+        const result = await ctx.page.evaluate(() => {
             const title = document.querySelector("title")?.textContent ?? null;
-            const lang =
-                document.querySelector("html")?.attributes.getNamedItem("lang")?.value ?? null;
+            const lang = document.documentElement.getAttribute("lang") ?? null;
 
             const h1s = Array.from(document.querySelectorAll("h1"))
                 .map((el) => el.textContent?.trim() ?? "")
@@ -89,36 +94,51 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
 
             const elements = Array.from(document.querySelectorAll("[href], [src]"));
             const links: ResourceReportLink[] = [];
+            const findings: Array<{ type: FindingSeverity; code: string; message: string }> = [];
 
             for (const el of elements) {
                 let url: string | null = null;
 
                 if (el.hasAttribute("href")) {
-                    url = (el as HTMLAnchorElement).href;
+                    url = el.getAttribute("href");
                 } else if (el.hasAttribute("src")) {
-                    // @ts-expect-error: the src attribute exist
-                    url = el.src;
+                    url = el.getAttribute("src");
                 }
 
-                if (typeof url !== "string") {
-                    this.registerWarning(
-                        ctx,
-                        "WRONG_URL",
-                        `Tag ${el.tagName.toLowerCase()} with unexpected link attribute (href or src).`,
-                    );
+                if (!url) {
+                    findings.push({
+                        type: "warning",
+                        code: "MISSING_URL",
+                        message: `Tag ${el.tagName.toLowerCase()} with missing link attribute (href or src).`,
+                    });
                     continue;
-                } else if (url === "") {
-                    this.registerWarning(
-                        ctx,
-                        "EMPTY_URL",
-                        `Tag ${el.tagName.toLowerCase()} with an empty link attribute (href or src).`,
-                    );
+                }
+
+                url = url.trim();
+
+                if (url === "") {
+                    findings.push({
+                        type: "warning",
+                        code: "EMPTY_URL",
+                        message: `Tag ${el.tagName.toLowerCase()} with an empty link attribute (href or src).`,
+                    });
                     continue;
+                }
+
+                let absoluteUrl = url;
+                try {
+                    absoluteUrl = new URL(url, document.baseURI).href;
+                } catch {
+                    findings.push({
+                        type: "error",
+                        code: "NOT_PARSABLE_URL",
+                        message: `URL ${url} is not parsable.`,
+                    });
                 }
 
                 links.push({
                     type: el.tagName.toLowerCase(),
-                    url,
+                    url: absoluteUrl,
                     text: el.textContent?.trim() ?? null,
                 });
             }
@@ -137,7 +157,21 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
                 links,
                 lang,
                 content,
+                findings,
             };
         });
+
+        for (const finding of result.findings) {
+            this.registerFinding(finding.type, ctx, finding.code, finding.message);
+        }
+
+        return {
+            title: result.title,
+            h1s: result.h1s,
+            description: result.description,
+            links: result.links,
+            lang: result.lang,
+            content: result.content,
+        };
     }
 }
