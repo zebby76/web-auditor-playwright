@@ -55,6 +55,23 @@ export type ResourceReportPa11yItem = {
     context?: string | null;
 };
 
+export type ResourceReportA11yAxeNode = {
+    impact: string | null | undefined;
+    html: string;
+    target: string | null;
+    failure_summary: string | undefined;
+    xpath: string[] | undefined;
+};
+export type ResourceReportA11yAxeItem = {
+    id: string;
+    impact: string | null | undefined;
+    tags: string[];
+    description: string;
+    help: string;
+    help_url: string;
+    nodes: ResourceReportA11yAxeNode[];
+};
+
 export type ResourceReport = {
     url: string | null;
     redirected: boolean;
@@ -72,6 +89,7 @@ export type ResourceReport = {
     content: string | null;
     links: ResourceReportLink[];
     pa11y: ResourceReportPa11yItem[];
+    a11y_axe: ResourceReportA11yAxeItem[];
     findings: Finding[];
     size: number | null;
 };

@@ -2,8 +2,8 @@ import { PluginRegistry } from "./engine/PluginRegistry.js";
 import { CrawlerEngine } from "./engine/CrawlerEngine.js";
 import { TimeUtils } from "./utils/TimeUtils.js";
 
+import { A11yAxePlugin } from "./plugins/A11yAxePlugin.js";
 // import { ConsoleErrorsPlugin } from "./plugins/ConsoleErrorsPlugin";
-// import { A11yAxePlugin } from "./plugins/A11yAxePlugin";
 // import { DeadLinksPlugin } from "./plugins/DeadLinksPlugin";
 // import { PdfTextractPlugin } from "./plugins/PdfTextractPlugin";
 // import { LighthouseEveryNHtmlPlugin } from "./plugins/LighthouseEveryNHtmlPlugin";
@@ -27,9 +27,15 @@ async function main() {
                 outputDir: process.env.REPORT_OUTPUT_DIR ?? "./reports",
             }),
         )
-        .register(new ProcessHtmlPlugin());
-
-    // .register(new A11yAxePlugin())
+        .register(new ProcessHtmlPlugin())
+        .register(
+            new A11yAxePlugin({
+                relevantTags: (process.env.A11Y_AXE_RELEVANT_TAGS ?? "wcag2a,wcag2aa")
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter(Boolean),
+            }),
+        );
     // .register(new DeadLinksPlugin({ checkExternal: (process.env.CHECK_EXTERNAL_LINKS ?? "false") === "true" }))
     // .register(new PdfTextractPlugin())
     // .register(new LighthouseEveryNHtmlPlugin(Number(process.env.LH_EVERY_N ?? 10)));

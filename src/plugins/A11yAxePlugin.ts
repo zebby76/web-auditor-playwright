@@ -1,0 +1,69 @@
+import { AxeBuilder } from "@axe-core/playwright";
+
+import { BasePlugin } from "../engine/BasePlugin.js";
+import {
+    IPlugin,
+    PluginPhase,
+    ResourceContext,
+    ResourceReportA11yAxeNode,
+} from "../engine/types.js";
+
+type A11yAxePluginOptions = {
+    relevantTags: string[];
+};
+
+export class A11yAxePlugin extends BasePlugin implements IPlugin {
+    name = "a11y-axe";
+    phases: PluginPhase[] = ["process", "error"];
+    private relevantTags: string[];
+
+    constructor(private readonly options: A11yAxePluginOptions) {
+        super();
+        this.relevantTags = options.relevantTags ?? null;
+    }
+
+    applies(ctx: ResourceContext): boolean {
+        return undefined !== ctx.mime && ctx.mime.includes("text/html");
+    }
+
+    async run(_phase: PluginPhase, ctx: ResourceContext): Promise<void> {
+        const result = await new AxeBuilder({ page: ctx.page }).analyze();
+
+        for (const violation of result.violations ?? []) {
+            if (!violation.tags.some((tag) => this.relevantTags.includes(tag))) {
+                continue;
+            }
+
+            const nodes: ResourceReportA11yAxeNode[] = [];
+            for (const node of violation.nodes ?? []) {
+                nodes.push({
+                    impact: node.impact,
+                    html: node.html,
+                    failure_summary: node.failureSummary,
+                    xpath: node.xpath,
+                    target: Array.isArray(node.target) ? node.target.join(", ") : null,
+                });
+            }
+            ctx.report.a11y_axe.push({
+                description: violation.description,
+                help: violation.help,
+                help_url: violation.helpUrl,
+                id: violation.id,
+                impact: violation.impact,
+                nodes,
+                tags: violation.tags,
+            });
+            const message = `${violation.help} (${violation.impact ?? "unknown"})`;
+            ctx.findings.push({
+                plugin: this.name,
+                type: "error",
+                code: violation.id,
+                message,
+            });
+
+            this.registerError();
+        }
+
+        this.registerUrl();
+    }
+}
