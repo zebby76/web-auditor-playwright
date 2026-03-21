@@ -101,7 +101,7 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
     }
 
     private async extractFromDom(ctx: ResourceContext) {
-        const extracted = await ctx.page.evaluate(() => {
+        return ctx.page.evaluate(() => {
             const title = document.querySelector("title")?.textContent ?? null;
             const lang =
                 document.querySelector("html")?.attributes.getNamedItem("lang")?.value ?? null;
@@ -173,6 +173,5 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
                 content,
             };
         });
-        return extracted;
     }
 }
