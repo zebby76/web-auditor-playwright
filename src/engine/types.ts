@@ -13,6 +13,17 @@ export type CrawlOptions = {
     rateLimitMs: number;
 };
 
+export type DownloadArtifact = {
+    sourceUrl: string;
+    suggestedFilename: string;
+    savedPath?: string;
+    size?: number;
+    sha256?: string;
+    mime?: string | null;
+    mimeSource?: "response-header" | "signature" | "extension" | "unknown";
+    cleanup?: boolean;
+};
+
 export type ResourceContext = {
     // identification
     url: string;
@@ -28,6 +39,7 @@ export type ResourceContext = {
     context: BrowserContext;
     response?: Response;
     download?: Download;
+    downloaded?: DownloadArtifact;
 
     // signals collected
     console: { type: string; text: string; location?: string }[];

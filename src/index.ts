@@ -8,9 +8,18 @@ import { ConsoleStatusPlugin } from "./plugins/ConsoleStatusPlugin.js";
 import { PerUrlJsonReportPlugin } from "./plugins/PerUrlJsonReportPlugin.js";
 import { ProcessHtmlPlugin } from "./plugins/ProcessHtmlPlugin.js";
 import { printPluginSummaryTable } from "./engine/summaryPrinter.js";
+import { DownloaderPlugin } from "./plugins/DownloaderPlugin.js";
 
 async function main() {
     const registry = new PluginRegistry()
+        // High priority plugins
+        .register(
+            new DownloaderPlugin({
+                outputDir: process.env.DOWNLOAD_OUTPUT_DIR ?? "./reports/downloads",
+                keepFiles: process.env.DOWNLOAD_KEEP_FILES === "true",
+            }),
+        )
+        // Normal priority plugins
         .register(new StatsCollectorPlugin({ rollingWindowSize: 12 }))
         .register(
             new ConsoleStatusPlugin({

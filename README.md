@@ -53,6 +53,8 @@ npm start
 | `REPORT_OUTPUT_DIR`      | `./reports`           | Path to the directory used to store URL reports (one JSON file per URL).                                                    |
 | `OUTPUT_FORMAT`          | `both`                | Controls output format of the crawler results (`json`, `table`, or `both`).                                                 |
 | `A11Y_AXE_RELEVANT_TAGS` | `EN-301-549`          | Comma-separated list of Axe rule tags to include in accessibility results filtering (e.g. `wcag2a,wcag2aa`).                |
+| `DOWNLOAD_OUTPUT_DIR`    | `./reports/downloads` | Directory where downloaded files are temporarily stored during analysis.                                                    |
+| `DOWNLOAD_KEEP_FILES`    | `false`               | If set to `true`, keeps downloaded files on disk instead of deleting them after processing.                                 |
 
 ## Performance Tuning
 
