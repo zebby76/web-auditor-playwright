@@ -56,17 +56,10 @@ export class A11yAxePlugin extends BasePlugin implements IPlugin {
                 en301549_criteria: this.extractEn301549Criteria(violation.tags),
             });
             const message = `${violation.help} (${violation.impact ?? "unknown"})`;
-            ctx.findings.push({
-                plugin: this.name,
-                type: "error",
-                code: violation.id,
-                message,
-            });
-
-            this.registerError();
+            this.registerError(ctx, violation.id, message);
         }
 
-        this.registerUrl();
+        this.register();
     }
 
     private extractWcagCriteria(tags: string[]): string[] {

@@ -123,9 +123,11 @@ export type EngineState = {
     any: Record<string, unknown>;
 };
 
+export type FindingSeverity = "info" | "warning" | "error";
+
 export type Finding = {
     plugin: string;
-    type: "info" | "warning" | "error";
+    type: FindingSeverity;
     code: string;
     message: string;
     data?: FindingData;

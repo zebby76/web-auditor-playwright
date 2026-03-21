@@ -31,13 +31,11 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
                 (l) => l.url.startsWith("mailto:") || l.url.startsWith("tel:"),
             ).length;
             if (mailOrTelLinkCount > 0) {
-                ctx.findings.push({
-                    plugin: this.name,
-                    type: "info",
-                    code: "MAIL_OR_TEL_LINK",
-                    message: `Contains ${mailOrTelLinkCount} mailto or tel links.`,
-                });
-                this.registerInfo();
+                this.registerInfo(
+                    ctx,
+                    "MAIL_OR_TEL_LINK",
+                    `Contains ${mailOrTelLinkCount} mailto or tel links.`,
+                );
             }
 
             for (const issue of titleAnalysis.issues) {
@@ -53,18 +51,17 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
                         mainTitle: titleAnalysis.mainTitle,
                     },
                 });
-                this.registerByType(issue.severity);
+                this.registerFinding(issue.severity, ctx, issue.code, issue.message, {
+                    title: titleAnalysis.normalized,
+                    length: titleAnalysis.length,
+                    brand: titleAnalysis.brand,
+                    mainTitle: titleAnalysis.mainTitle,
+                });
             }
 
             const wordCount = extracted.content.split(/\s+/).length;
             if (wordCount < 100) {
-                ctx.findings.push({
-                    plugin: this.name,
-                    type: "warning",
-                    code: "LOW_CONTENT",
-                    message: `Low content page (${wordCount} words).`,
-                });
-                this.registerWarning();
+                this.registerWarning(ctx, "LOW_CONTENT", `Low content page (${wordCount} words).`);
             }
 
             ctx.report.is_web = true;
@@ -83,19 +80,17 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
                     source: this.name,
                 });
             }
-            this.registerUrl();
+            this.register();
         } catch (e: unknown) {
             let errorMessage = "Unknown error: " + String(e);
             if (e instanceof Error) {
                 errorMessage = e.message;
             }
-            ctx.findings.push({
-                plugin: this.name,
-                type: "error",
-                code: "PROCESS_HTML_ERROR",
-                message: `It's impossible to process the URL ${ctx.url}: ${errorMessage}.`,
-            });
-            this.registerError();
+            this.registerError(
+                ctx,
+                "PROCESS_HTML_ERROR",
+                `It's impossible to process the URL ${ctx.url}: ${errorMessage}.`,
+            );
             return;
         }
     }
@@ -131,22 +126,18 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
                 }
 
                 if (typeof url !== "string") {
-                    ctx.findings.push({
-                        plugin: this.name,
-                        type: "warning",
-                        code: "WRONG_URL",
-                        message: `Tag ${el.tagName.toLowerCase()} with unexpected link attribute (href or src).`,
-                    });
-                    this.registerWarning();
+                    this.registerWarning(
+                        ctx,
+                        "WRONG_URL",
+                        `Tag ${el.tagName.toLowerCase()} with unexpected link attribute (href or src).`,
+                    );
                     continue;
                 } else if (url === "") {
-                    ctx.findings.push({
-                        plugin: this.name,
-                        type: "warning",
-                        code: "EMPTY_URL",
-                        message: `Tag ${el.tagName.toLowerCase()} with an empty link attribute (href or src).`,
-                    });
-                    this.registerWarning();
+                    this.registerWarning(
+                        ctx,
+                        "EMPTY_URL",
+                        `Tag ${el.tagName.toLowerCase()} with an empty link attribute (href or src).`,
+                    );
                     continue;
                 }
 

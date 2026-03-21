@@ -1,4 +1,4 @@
-export type TitleIssueSeverity = "info" | "warning" | "error";
+import { FindingSeverity } from "../engine/types.js";
 
 export type TitleIssueCode =
     | "TITLE_MISSING"
@@ -11,7 +11,7 @@ export type TitleIssueCode =
 
 export type TitleIssue = {
     code: TitleIssueCode;
-    severity: TitleIssueSeverity;
+    severity: FindingSeverity;
     message: string;
 };
 

@@ -1,11 +1,11 @@
-import type { PluginSummary } from "./types.js";
-import { TitleIssueSeverity } from "../utils/TitleAnalyzer.js";
+import { FindingData, FindingSeverity, PluginSummary, ResourceContext } from "./types.js";
 
 export abstract class BasePlugin {
     protected auditedUrls = 0;
     protected infos = 0;
     protected warnings = 0;
     protected errors = 0;
+    protected abstract name: string;
 
     includeInSummary(): boolean {
         return true;
@@ -21,32 +21,45 @@ export abstract class BasePlugin {
         };
     }
 
-    protected registerUrl(): void {
+    protected register(): void {
         this.auditedUrls += 1;
     }
 
-    protected registerInfo(): void {
-        this.infos += 1;
+    protected registerInfo(ctx: ResourceContext, code: string, message: string): void {
+        this.registerFinding("info", ctx, code, message);
     }
 
-    protected registerWarning(): void {
-        this.warnings += 1;
+    protected registerWarning(ctx: ResourceContext, code: string, message: string): void {
+        this.registerFinding("warning", ctx, code, message);
     }
 
-    protected registerError(): void {
-        this.errors += 1;
+    protected registerError(ctx: ResourceContext, code: string, message: string): void {
+        this.registerFinding("error", ctx, code, message);
     }
 
-    protected registerByType(severity: TitleIssueSeverity) {
+    protected registerFinding(
+        severity: FindingSeverity,
+        ctx: ResourceContext,
+        code: string,
+        message: string,
+        data?: FindingData,
+    ) {
+        ctx.findings.push({
+            plugin: this.name,
+            type: severity,
+            code,
+            message,
+            data,
+        });
         switch (severity) {
             case "info":
-                this.registerInfo();
+                this.infos += 1;
                 break;
             case "warning":
-                this.registerWarning();
+                this.warnings += 1;
                 break;
             case "error":
-                this.registerError();
+                this.errors += 1;
                 break;
         }
     }
