@@ -1,4 +1,4 @@
-import type { BrowserContext, Page, Response } from "playwright";
+import type { BrowserContext, Download, Page, Response } from "playwright";
 
 export type Mime = string;
 
@@ -27,6 +27,7 @@ export type ResourceContext = {
     page: Page;
     context: BrowserContext;
     response?: Response;
+    download?: Download;
 
     // signals collected
     console: { type: string; text: string; location?: string }[];

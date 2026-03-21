@@ -170,6 +170,7 @@ export class CrawlerEngine {
             } catch (e: unknown) {
                 const download = await downloadPromise;
                 if (download) {
+                    ctx.download = download;
                     await this.registry.runPhase("download", ctx);
                 } else {
                     let errorMessage = "Unknown error: " + String(e);
