@@ -40,7 +40,7 @@ npm start
 ```
 
 | Variable                 | Default               | Description                                                                                                                 |
-| ------------------------ | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| ------------------------ |-----------------------|-----------------------------------------------------------------------------------------------------------------------------|
 | `START_URL`              | `https://example.org` | The initial URL where the crawler starts. All discovered pages will be crawled starting from this entry point.              |
 | `MAX_PAGES`              | `50`                  | Maximum number of pages the crawler will visit before stopping.                                                             |
 | `MAX_DEPTH`              | `3`                   | Maximum crawl depth starting from the `START_URL`. Depth `0` is the start page.                                             |
@@ -52,7 +52,7 @@ npm start
 | `LH_EVERY_N`             | `10`                  | Run a Lighthouse audit every N HTML pages visited.                                                                          |
 | `REPORT_OUTPUT_DIR`      | `./reports`           | Path to the directory used to store URL reports (one JSON file per URL).                                                    |
 | `OUTPUT_FORMAT`          | `both`                | Controls output format of the crawler results (`json`, `table`, or `both`).                                                 |
-| `A11Y_AXE_RELEVANT_TAGS` | `wcag2a,wcag2aa`      | Comma-separated list of Axe rule tags to include in accessibility results filtering.                                        |
+| `A11Y_AXE_RELEVANT_TAGS` | `EN-301-549`          | Comma-separated list of Axe rule tags to include in accessibility results filtering (e.g. `wcag2a,wcag2aa`).                |
 
 ## Performance Tuning
 

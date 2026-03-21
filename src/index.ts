@@ -30,7 +30,7 @@ async function main() {
         .register(new ProcessHtmlPlugin())
         .register(
             new A11yAxePlugin({
-                relevantTags: (process.env.A11Y_AXE_RELEVANT_TAGS ?? "wcag2a,wcag2aa")
+                relevantTags: (process.env.A11Y_AXE_RELEVANT_TAGS ?? "EN-301-549")
                     .split(",")
                     .map((tag) => tag.trim())
                     .filter(Boolean),
