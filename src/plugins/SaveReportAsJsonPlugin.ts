@@ -5,15 +5,15 @@ import crypto from "node:crypto";
 import type { IPlugin, PluginPhase, ResourceContext } from "../engine/types.js";
 import { BasePlugin } from "../engine/BasePlugin.js";
 
-type PerUrlJsonReportPluginOptions = {
+type SaveReportAsJsonPluginOptions = {
     outputDir: string;
 };
 
-export class PerUrlJsonReportPlugin extends BasePlugin implements IPlugin {
+export class SaveReportAsJsonPlugin extends BasePlugin implements IPlugin {
     name = "per-url-json-report";
     phases: PluginPhase[] = ["finally"];
 
-    constructor(private readonly options: PerUrlJsonReportPluginOptions) {
+    constructor(private readonly options: SaveReportAsJsonPluginOptions) {
         super();
     }
 

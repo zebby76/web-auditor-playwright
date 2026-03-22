@@ -5,7 +5,7 @@ import { TimeUtils } from "./utils/TimeUtils.js";
 import { A11yAxePlugin } from "./plugins/A11yAxePlugin.js";
 import { StatsCollectorPlugin } from "./plugins/StatsCollectorPlugin.js";
 import { ConsoleStatusPlugin } from "./plugins/ConsoleStatusPlugin.js";
-import { PerUrlJsonReportPlugin } from "./plugins/PerUrlJsonReportPlugin.js";
+import { SaveReportAsJsonPlugin } from "./plugins/SaveReportAsJsonPlugin.js";
 import { ProcessHtmlPlugin } from "./plugins/ProcessHtmlPlugin.js";
 import { DownloaderPlugin } from "./plugins/DownloaderPlugin.js";
 import { CleanDownloadedPlugin } from "./plugins/CleanDownloadedPlugin.js";
@@ -31,7 +31,7 @@ async function main() {
             }),
         )
         .register(
-            new PerUrlJsonReportPlugin({
+            new SaveReportAsJsonPlugin({
                 outputDir: process.env.REPORT_OUTPUT_DIR ?? "./reports",
             }),
         )
