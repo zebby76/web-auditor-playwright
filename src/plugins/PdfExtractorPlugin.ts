@@ -29,7 +29,7 @@ type TextToken = {
 
 export class PdfExtractorPlugin extends BasePlugin implements IPlugin {
     name = "pdf-extractor";
-    phases: PluginPhase[] = ["after-download"];
+    phases: PluginPhase[] = ["download"];
 
     private readonly maxExtractedChars: number;
     private readonly maxLinks: number;

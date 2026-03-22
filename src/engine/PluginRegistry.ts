@@ -14,14 +14,15 @@ export class PluginRegistry {
     }
 
     async runPhase(phase: PluginPhase, ctx: ResourceContext): Promise<void> {
-        const eligible = this.plugins.filter((p) => p.phases.includes(phase) && p.applies(ctx));
-
-        for (const p of eligible) {
+        for (const plugin of this.plugins) {
+            if (!plugin.phases.includes(phase) || !plugin.applies(ctx)) {
+                continue;
+            }
             try {
-                await p.run(phase, ctx);
+                await plugin.run(phase, ctx);
             } catch (e) {
                 ctx.findings.push({
-                    plugin: p.name,
+                    plugin: plugin.name,
                     type: "error",
                     code: "UNEXPECTED_ERROR",
                     message: ErrorUtils.errorMessage("Failed to run the plugin", e),

@@ -163,7 +163,6 @@ export type PluginPhase =
     | "process"
     | "periodic"
     | "download"
-    | "after-download"
     | "error"
     | "finally";
 

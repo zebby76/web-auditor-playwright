@@ -170,7 +170,6 @@ export class CrawlerEngine {
                 if (!ctx.audited) {
                     ctx.downloadTrigger = "inline-resource";
                     await this.registry.runPhase("download", ctx);
-                    await this.registry.runPhase("after-download", ctx);
                 } else {
                     await this.registry.runPhase("periodic", ctx);
                 }
@@ -180,7 +179,6 @@ export class CrawlerEngine {
                     ctx.download = download;
                     ctx.downloadTrigger = "playwright-download";
                     await this.registry.runPhase("download", ctx);
-                    await this.registry.runPhase("after-download", ctx);
                 } else {
                     ctx.findings.push({
                         plugin: "engine",
