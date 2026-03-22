@@ -55,6 +55,7 @@ export abstract class BasePlugin {
         message: string,
         data?: FindingData,
     ) {
+        ctx.audited ||= this.isAuditPlugin();
         ctx.findings.push({
             plugin: this.name,
             type: severity,
