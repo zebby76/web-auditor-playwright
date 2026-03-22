@@ -17,7 +17,7 @@ type MammothModule = {
     extractRawText(input: { path: string }): Promise<{ value: string }>;
 };
 
-export class DocxDownloadedExtractorPlugin extends BasePlugin implements IPlugin {
+export class DocxExtractorPlugin extends BasePlugin implements IPlugin {
     name = "docx-extractor";
     phases: PluginPhase[] = ["download"];
 
