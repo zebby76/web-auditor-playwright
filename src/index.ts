@@ -160,6 +160,7 @@ async function main() {
             maxDepth: Number(process.env.MAX_DEPTH ?? 3),
             concurrency: Number(process.env.CONCURRENCY ?? 3),
             navTimeoutMs: Number(process.env.NAV_TIMEOUT_MS ?? 30000),
+            userAgent: process.env.USER_AGENT,
             rateLimitMs: Number(process.env.RATE_LIMIT_MS ?? 500),
         },
         registry,
