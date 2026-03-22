@@ -61,6 +61,12 @@ export class TextDownloadedExtractorPlugin extends BasePlugin implements IPlugin
             );
 
             const links = TextUtils.extractLinks(text, this.maxLinks, "extracted");
+            for (const link of links) {
+                ctx.crawler.enqueueUrl({
+                    url: link.url,
+                    source: this.name,
+                });
+            }
 
             ctx.report.content = text;
             ctx.report.message = `Text extracted from ${mime}.`;
