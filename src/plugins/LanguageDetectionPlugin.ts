@@ -13,7 +13,7 @@ type LanguageDetectionPluginOptions = {
 
 export class LanguageDetectionPlugin extends BasePlugin implements IPlugin {
     name = "language-detection";
-    phases: PluginPhase[] = ["before-finally"];
+    phases: PluginPhase[] = ["beforeFinally"];
 
     private readonly minLength: number;
     private readonly maxSampleLength: number;

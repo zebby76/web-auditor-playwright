@@ -172,7 +172,7 @@ export type PluginPhase =
     | "periodic"
     | "download"
     | "error"
-    | "before-finally"
+    | "beforeFinally"
     | "finally";
 
 export type PluginSummary = {
