@@ -72,7 +72,10 @@ async function main() {
                 ),
             }),
         )
-        .register(
+        .register(new CleanDownloadedPlugin());
+
+    if (process.env.DOWNLOAD_ENABLE_TEXTRACT_FALLBACK ?? "true") {
+        registry.register(
             new TextractExtractorPlugin({
                 maxExtractedChars: Number(process.env.DOWNLOAD_MAX_EXTRACTED_CHARS ?? 200000),
                 maxLinks: Number(process.env.DOWNLOAD_MAX_LINKS ?? 500),
@@ -80,8 +83,8 @@ async function main() {
                     process.env.DOWNLOAD_MAX_BINARY_READ_BYTES ?? 20 * 1024 * 1024,
                 ),
             }),
-        )
-        .register(new CleanDownloadedPlugin());
+        );
+    }
 
     const outputFormat = process.env.OUTPUT_FORMAT ?? "both";
     const engine = new CrawlerEngine(

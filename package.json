@@ -16,7 +16,7 @@
         "mammoth": "^1.12.0",
         "pdfjs-dist": "^5.5.207",
         "playwright": "^1.49.0",
-        "textract": "^0.20.0"
+        "textract": "2.5.0"
     },
     "devDependencies": {
         "@types/node": "^25.3.5",

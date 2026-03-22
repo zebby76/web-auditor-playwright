@@ -65,7 +65,7 @@ export class TextractExtractorPlugin extends BasePlugin implements IPlugin {
 
         let textract: TextractModule;
         try {
-            textract = require("textract") as TextractModule;
+            textract = this.loadTextract();
         } catch (error) {
             this.registerWarning(
                 ctx,
@@ -121,5 +121,41 @@ export class TextractExtractorPlugin extends BasePlugin implements IPlugin {
         }
 
         this.register(ctx);
+    }
+
+    private loadTextract(): TextractModule {
+        const mod = require("textract") as unknown;
+        console.log(typeof mod);
+
+        const candidates: unknown[] = [
+            mod,
+            this.getProperty(mod, "default"),
+            this.getProperty(this.getProperty(mod, "default"), "default"),
+        ];
+
+        for (const candidate of candidates) {
+            if (this.isTextractModule(candidate)) {
+                return candidate;
+            }
+        }
+
+        throw new Error("Invalid textract module shape");
+    }
+
+    private isTextractModule(value: unknown): value is TextractModule {
+        if (!value || (typeof value !== "object" && typeof value !== "function")) {
+            return false;
+        }
+
+        const record = value as Record<string, unknown>;
+        return typeof record.fromFileWithPath === "function";
+    }
+
+    private getProperty(value: unknown, key: string): unknown {
+        if (!value || (typeof value !== "object" && typeof value !== "function")) {
+            return undefined;
+        }
+
+        return (value as Record<string, unknown>)[key];
     }
 }
