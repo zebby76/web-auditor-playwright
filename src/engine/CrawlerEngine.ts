@@ -167,11 +167,18 @@ export class CrawlerEngine {
 
                 await this.registry.runPhase("process", ctx);
 
-                await this.registry.runPhase("periodic", ctx);
+                if (!ctx.audited) {
+                    ctx.downloadTrigger = "inline-resource";
+                    await this.registry.runPhase("download", ctx);
+                    await this.registry.runPhase("after-download", ctx);
+                } else {
+                    await this.registry.runPhase("periodic", ctx);
+                }
             } catch (e: unknown) {
                 const download = await downloadPromise;
                 if (download) {
                     ctx.download = download;
+                    ctx.downloadTrigger = "playwright-download";
                     await this.registry.runPhase("download", ctx);
                     await this.registry.runPhase("after-download", ctx);
                 } else {

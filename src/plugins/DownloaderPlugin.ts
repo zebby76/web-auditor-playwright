@@ -31,11 +31,11 @@ export class DownloaderPlugin extends BasePlugin implements IPlugin {
     }
 
     applies(ctx: ResourceContext): boolean {
-        return !!ctx.download;
+        return !!ctx.downloadTrigger;
     }
 
     async run(_phase: PluginPhase, ctx: ResourceContext): Promise<void> {
-        if (!ctx.download) {
+        if (!ctx.downloadTrigger) {
             return;
         }
 
@@ -45,25 +45,43 @@ export class DownloaderPlugin extends BasePlugin implements IPlugin {
 
         await fsp.mkdir(this.outputDir, { recursive: true });
 
-        const sourceUrl = ctx.download.url() || ctx.finalUrl || ctx.url;
+        const sourceUrl = ctx.download?.url() || ctx.finalUrl || ctx.url;
         const suggestedFilename = this.sanitizeFilename(
-            ctx.download.suggestedFilename() || this.filenameFromUrl(sourceUrl) || "download.bin",
+            ctx.download?.suggestedFilename() || this.filenameFromUrl(sourceUrl) || "download.bin",
         );
 
         const savedFilename = `${this.shortHash(`${sourceUrl}|${Date.now()}`)}-${suggestedFilename}`;
         const savedPath = path.join(this.outputDir, savedFilename);
 
         try {
-            await ctx.download.saveAs(savedPath);
+            if (ctx.download) {
+                await ctx.download.saveAs(savedPath);
+            } else {
+                const requestContext = ctx.context.request;
+                const response = await requestContext.get(ctx.finalUrl ?? ctx.url);
+
+                if (response.ok()) {
+                    const buffer = await response.body();
+                    await fsp.writeFile(savedPath, buffer);
+                } else {
+                    this.registerError(
+                        ctx,
+                        "DOWNLOAD_FAILED",
+                        ErrorUtils.errorMessage(
+                            "Failed to fetch inline resource",
+                            response.statusText(),
+                        ),
+                    );
+                }
+            }
         } catch (error) {
             ctx.status = ctx.report.status_code = ctx.status ?? 400;
-            ctx.report.message = "Unable to save downloaded file";
+            ctx.report.message = "Unable to download file";
             this.registerError(
                 ctx,
-                "DOWNLOAD_SAVE_FAILED",
+                "DOWNLOAD_FAILED",
                 ErrorUtils.errorMessage(ctx.report.message, error),
             );
-            this.register(ctx);
             return;
         }
 

@@ -40,6 +40,7 @@ export type ResourceContext = {
     response?: Response;
     download?: Download;
     downloaded?: DownloadArtifact;
+    downloadTrigger?: "playwright-download" | "inline-resource";
 
     // signals collected
     console: { type: string; text: string; location?: string }[];
