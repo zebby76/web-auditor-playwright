@@ -39,7 +39,12 @@ export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
             this.registerInfo(
                 ctx,
                 "MAIL_OR_TEL_LINK",
-                `Contains ${mailOrTelLinkCount} mailto or tel links.`,
+                `Contains ${mailOrTelLinkCount} mailto or tel link(s).`,
+                {
+                    links: extracted.links.filter(
+                        (l) => l.url.startsWith("mailto:") || l.url.startsWith("tel:"),
+                    ),
+                },
             );
         }
 
