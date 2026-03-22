@@ -10,7 +10,7 @@ import { ProcessHtmlPlugin } from "./plugins/ProcessHtmlPlugin.js";
 import { DownloaderPlugin } from "./plugins/DownloaderPlugin.js";
 import { CleanDownloadedPlugin } from "./plugins/CleanDownloadedPlugin.js";
 import { TextDownloadedExtractorPlugin } from "./plugins/TextDownloadedExtractorPlugin.js";
-import { PdfDownloadedExtractorPlugin } from "./plugins/PdfDownloadedExtractorPlugin.js";
+import { PdfExtractorPlugin } from "./plugins/PdfExtractorPlugin.js";
 import { DocxDownloadedExtractorPlugin } from "./plugins/DocxDownloadedExtractorPlugin.js";
 import { TextractDownloadedExtractorPlugin } from "./plugins/TextractDownloadedExtractorPlugin.js";
 import { printPluginSummaryTable } from "./engine/summaryPrinter.js";
@@ -54,9 +54,10 @@ async function main() {
             }),
         )
         .register(
-            new PdfDownloadedExtractorPlugin({
+            new PdfExtractorPlugin({
                 maxExtractedChars: Number(process.env.DOWNLOAD_MAX_EXTRACTED_CHARS ?? 200000),
                 maxLinks: Number(process.env.DOWNLOAD_MAX_LINKS ?? 500),
+                maxPages: Number(process.env.DOWNLOAD_MAX_PDF_PAGES ?? 200),
                 maxFileSizeBytes: Number(
                     process.env.DOWNLOAD_MAX_TEXT_READ_BYTES ?? 5 * 1024 * 1024,
                 ),

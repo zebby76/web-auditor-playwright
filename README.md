@@ -56,6 +56,7 @@ npm start
 | `DOWNLOAD_OUTPUT_DIR`            | `./reports/downloads` | Directory where downloaded files are temporarily stored during analysis.                                                    |
 | `DOWNLOAD_KEEP_FILES`            | `false`               | If set to `true`, keeps downloaded files on disk instead of deleting them after processing.                                 |
 | `DOWNLOAD_MAX_EXTRACTED_CHARS`   | `200000`              | Maximum number of characters extracted from a downloaded resource's content.                                                |
+| `DOWNLOAD_MAX_PDF_PAGES`         | `200`                 | Maximum number of PDF pages to parse when extracting text from downloaded PDF resources.                                    |
 | `DOWNLOAD_MAX_LINKS`             | `500`                 | Maximum number of links extracted from a downloaded resource.                                                               |
 | `DOWNLOAD_MAX_TEXT_READ_BYTES`   | `5.242.880`           | Maximum file size (in bytes) allowed for text-based extraction from downloaded resources.                                   |
 | `DOWNLOAD_MAX_BINARY_READ_BYTES` | `20.971.520`          | Maximum file size (in bytes) allowed for binary document extraction from downloaded resources.                              |
