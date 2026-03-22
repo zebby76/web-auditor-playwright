@@ -2,6 +2,7 @@ import { PluginRegistry } from "./engine/PluginRegistry.js";
 import { CrawlerEngine } from "./engine/CrawlerEngine.js";
 import { TimeUtils } from "./utils/TimeUtils.js";
 
+import { printPluginSummaryTable } from "./engine/summaryPrinter.js";
 import { A11yAxePlugin } from "./plugins/A11yAxePlugin.js";
 import { StatsCollectorPlugin } from "./plugins/StatsCollectorPlugin.js";
 import { ConsoleStatusPlugin } from "./plugins/ConsoleStatusPlugin.js";
@@ -14,7 +15,7 @@ import { PdfExtractorPlugin } from "./plugins/PdfExtractorPlugin.js";
 import { DocxExtractorPlugin } from "./plugins/DocxExtractorPlugin.js";
 import { TextractExtractorPlugin } from "./plugins/TextractExtractorPlugin.js";
 import { LanguageDetectionPlugin } from "./plugins/LanguageDetectionPlugin.js";
-import { printPluginSummaryTable } from "./engine/summaryPrinter.js";
+import { StandardUrlsAuditPlugin } from "./plugins/StandardUrlsAuditPlugin.js";
 
 async function main() {
     const registry = new PluginRegistry()
@@ -80,6 +81,7 @@ async function main() {
                 overwriteExistingLocale: process.env.LANGUAGE_DETECTION_OVERWRITE === "true",
             }),
         )
+        .register(new StandardUrlsAuditPlugin())
         .register(new CleanDownloadedPlugin());
 
     if (process.env.DOWNLOAD_ENABLE_TEXTRACT_FALLBACK ?? "true") {
