@@ -8,17 +8,17 @@ import {
 import { BasePlugin } from "../engine/BasePlugin.js";
 import { TitleAnalyzer } from "../utils/TitleAnalyzer.js";
 
-type ProcessHtmlPluginOptions = {
+type HtmlProcessorPluginOptions = {
     maxLinksPerPage?: number;
 };
 
-export class ProcessHtmlPlugin extends BasePlugin implements IPlugin {
-    name = "process-html";
+export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
+    name = "html-processor";
     phases: PluginPhase[] = ["process", "error"];
 
     private readonly maxLinksPerPage: number | null;
 
-    constructor(options: ProcessHtmlPluginOptions = {}) {
+    constructor(options: HtmlProcessorPluginOptions = {}) {
         super();
         this.maxLinksPerPage = options.maxLinksPerPage ?? null;
     }

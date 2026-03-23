@@ -11,7 +11,7 @@ import { A11yAxePlugin } from "./plugins/A11yAxePlugin.js";
 import { StatsCollectorPlugin } from "./plugins/StatsCollectorPlugin.js";
 import { ConsoleStatusPlugin } from "./plugins/ConsoleStatusPlugin.js";
 import { SaveReportAsJsonPlugin } from "./plugins/SaveReportAsJsonPlugin.js";
-import { ProcessHtmlPlugin } from "./plugins/ProcessHtmlPlugin.js";
+import { HtmlProcessorPlugin } from "./plugins/HtmlProcessorPlugin.js";
 import { DownloaderPlugin } from "./plugins/DownloaderPlugin.js";
 import { CleanDownloadedPlugin } from "./plugins/CleanDownloadedPlugin.js";
 import { TextExtractorPlugin } from "./plugins/TextExtractorPlugin.js";
@@ -84,7 +84,7 @@ async function main() {
                 ),
             }),
         )
-        .register(new ProcessHtmlPlugin())
+        .register(new HtmlProcessorPlugin())
         .register(
             new A11yAxePlugin({
                 relevantTags: (process.env.A11Y_AXE_RELEVANT_TAGS ?? "EN-301-549")
