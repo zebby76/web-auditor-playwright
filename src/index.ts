@@ -24,6 +24,7 @@ import { StandardUrlsAuditPlugin } from "./plugins/StandardUrlsAuditPlugin.js";
 import { ConsolePlugin } from "./plugins/ConsolePlugin.js";
 import { PdfAccessibilityPlugin } from "./plugins/PdfAccessibilityPlugin.js";
 import { PerformanceMetricsPlugin } from "./plugins/PerformanceMetricsPlugin.js";
+import { TlsCertificatePlugin } from "./plugins/TlsCertificatePlugin.js";
 
 async function main() {
     const reportOutputDir = process.env.REPORT_OUTPUT_DIR ?? "./reports";
@@ -133,6 +134,13 @@ async function main() {
         .register(
             new SecurityHeadersPlugin({
                 auditOnlyStartUrl: (process.env.SECURITY_ONLY_START_URL ?? "true") === "true",
+            }),
+        )
+        .register(
+            new TlsCertificatePlugin({
+                auditOnlyStartUrl: (process.env.TLS_CERT_AUDIT_ONLY_START_URL ?? "true") === "true",
+                warnIfExpiresInDays: Number(process.env.TLS_CERT_WARN_IF_EXPIRES_IN_DAYS ?? 30),
+                timeoutMs: Number(process.env.TLS_CERT_TIMEOUT_MS ?? 10000),
             }),
         )
         .register(
