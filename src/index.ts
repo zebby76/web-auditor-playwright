@@ -32,7 +32,12 @@ import { XlsxExporter } from "./reporting/XlsxExporter.js";
 async function main() {
     const reportOutputDir = process.env.REPORT_OUTPUT_DIR ?? "./reports";
     const websiteId = process.env.WEBSITE_ID ?? "my_website";
-    const registry = new PluginRegistry()
+    const registry = new PluginRegistry({
+        disabledPlugins: (process.env.DISABLED_PLUGINS ?? "")
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+    })
         .register(new StatsCollectorPlugin({ rollingWindowSize: 12 }))
         .register(
             new ConsoleStatusPlugin({

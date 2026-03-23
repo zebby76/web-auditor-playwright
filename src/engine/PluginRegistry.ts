@@ -1,10 +1,22 @@
 import type { IPlugin, PluginPhase, PluginSummary, ResourceContext } from "./types.js";
 import { ErrorUtils } from "../utils/ErrorUtils.js";
 
+type PluginRegistryOptions = {
+    disabledPlugins: string[];
+};
+
 export class PluginRegistry {
     private plugins: IPlugin[] = [];
+    private disabledPlugins: string[];
+
+    constructor(private readonly options: PluginRegistryOptions) {
+        this.disabledPlugins = options.disabledPlugins ?? null;
+    }
 
     register(plugin: IPlugin): this {
+        if (this.disabledPlugins.includes(plugin.name)) {
+            return this;
+        }
         this.plugins.push(plugin);
         return this;
     }
