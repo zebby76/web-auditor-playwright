@@ -33,7 +33,6 @@ export abstract class BasePlugin {
 
     protected register(ctx: ResourceContext): void {
         this.addAuditor(ctx);
-        this.treatedUrls += 1;
     }
 
     protected registerInfo(
@@ -115,5 +114,6 @@ export abstract class BasePlugin {
             return;
         }
         ctx.auditors.push(this.name);
+        this.treatedUrls += 1;
     }
 }
