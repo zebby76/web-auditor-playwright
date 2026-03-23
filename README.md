@@ -5,7 +5,7 @@
 ```shell
 npm install
 npm run build
-START_URL=your-site.com npm start
+START_URL=your-site.com RATE_LIMIT_MS=400 WEBSITE_ID=your_site npm start
 ```
 
 ## Build & run
