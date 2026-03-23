@@ -47,6 +47,7 @@ export class TextExtractorPlugin extends BasePlugin implements IPlugin {
         if (size > this.maxFileSizeBytes) {
             this.registerWarning(
                 ctx,
+                "content",
                 "TEXT_EXTRACTION_SKIPPED_TOO_LARGE",
                 `Text extraction skipped because the file is larger than ${this.maxFileSizeBytes} bytes.`,
             );
@@ -75,6 +76,7 @@ export class TextExtractorPlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerWarning(
                 ctx,
+                "plugins",
                 "TEXT_EXTRACTION_FAILED",
                 ErrorUtils.errorMessage("Failed to read textual downloaded resource", error),
             );

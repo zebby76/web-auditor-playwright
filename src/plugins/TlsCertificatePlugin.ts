@@ -81,6 +81,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (phase === "error") {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_NOT_AUDITED",
                 "TLS certificate could not be audited because the start URL failed to load.",
                 { targetUrl },
@@ -95,6 +96,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         } catch {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_INVALID_URL",
                 "TLS certificate audit skipped because the URL is invalid.",
                 { targetUrl },
@@ -106,6 +108,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (parsedUrl.protocol !== "https:") {
             this.registerInfo(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_NOT_APPLICABLE",
                 "TLS certificate audit skipped because the URL is not HTTPS.",
                 { targetUrl, protocol: parsedUrl.protocol },
@@ -128,6 +131,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
 
             this.registerInfo(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_DETAILS",
                 "TLS certificate details collected for the start URL.",
                 cert,
@@ -138,6 +142,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerError(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_AUDIT_FAILED",
                 "TLS certificate audit failed.",
                 {
@@ -171,6 +176,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (cert.score < this.minScoreForError || cert.expired || !cert.authorized) {
             this.registerError(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_SCORE",
                 `TLS certificate score: ${cert.grade} (${cert.score}/100). ${summary}`,
                 payload,
@@ -188,6 +194,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         ) {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_SCORE",
                 `TLS certificate score: ${cert.grade} (${cert.score}/100). ${summary}`,
                 payload,
@@ -197,6 +204,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
 
         this.registerInfo(
             ctx,
+            "security",
             "TLS_CERTIFICATE_SCORE",
             `TLS certificate score: ${cert.grade} (${cert.score}/100). ${summary}`,
             payload,
@@ -207,6 +215,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (!cert.authorized) {
             this.registerError(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_INVALID",
                 `The TLS certificate is not trusted by Node/OpenSSL: ${cert.authorizationError ?? "unknown error"}.`,
                 cert,
@@ -216,6 +225,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (cert.expired) {
             this.registerError(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_EXPIRED",
                 "The TLS certificate is expired.",
                 cert,
@@ -223,6 +233,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         } else if (cert.checks.expiresSoon && cert.daysRemaining !== null) {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_EXPIRING_SOON",
                 `The TLS certificate expires in ${cert.daysRemaining} day(s).`,
                 cert,
@@ -232,6 +243,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (cert.selfSigned) {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_SELF_SIGNED",
                 "The TLS certificate appears to be self-signed.",
                 cert,
@@ -241,6 +253,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (!cert.checks.hasSan) {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_NO_SAN",
                 "The TLS certificate does not expose a Subject Alternative Name (SAN).",
                 cert,
@@ -250,6 +263,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (!cert.checks.tlsVersionOk) {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_OLD_TLS_VERSION",
                 `The negotiated TLS version (${cert.protocol ?? "unknown"}) is below the expected minimum (${this.minAcceptedTlsVersion}).`,
                 cert,
@@ -259,6 +273,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (cert.checks.weakCipher) {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_WEAK_CIPHER",
                 `The negotiated cipher looks weak or legacy: ${cert.cipherName ?? "unknown"}.`,
                 cert,
@@ -268,6 +283,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         if (cert.checks.chainTooShort) {
             this.registerWarning(
                 ctx,
+                "security",
                 "TLS_CERTIFICATE_SHORT_CHAIN",
                 `The certificate chain looks unusually short (depth=${cert.chainDepth}).`,
                 cert,

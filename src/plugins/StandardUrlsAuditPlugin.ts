@@ -82,6 +82,7 @@ export class StandardUrlsAuditPlugin extends BasePlugin implements IPlugin {
             if (!result.accepted) {
                 this.registerInfo(
                     ctx,
+                    "best-practices",
                     "STANDARD_URL_NOT_ENQUEUED",
                     `Did not queue standard URL: ${spec.path} (${result.reason ?? "unknown"}).`,
                     {
@@ -118,6 +119,7 @@ export class StandardUrlsAuditPlugin extends BasePlugin implements IPlugin {
 
         this.registerFinding(
             spec.severityIfMissing ?? "warning",
+            "best-practices",
             ctx,
             "STANDARD_URL_MISSING",
             `Standard URL missing or not reachable: ${spec.path}.`,

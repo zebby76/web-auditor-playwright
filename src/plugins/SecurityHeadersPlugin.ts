@@ -44,6 +44,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
         if (phase === "error") {
             this.registerWarning(
                 ctx,
+                "security",
                 "SECURITY_HEADERS_NOT_AUDITED",
                 "Could not audit security headers because the start URL failed to load.",
             );
@@ -78,6 +79,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("hsts", true, 10);
             this.registerInfo(
                 ctx,
+                "security",
                 "HSTS_NOT_APPLICABLE",
                 "Strict-Transport-Security is only applicable on HTTPS responses.",
             );
@@ -88,6 +90,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("hsts", false, 10);
             this.registerError(
                 ctx,
+                "security",
                 "MISSING_HSTS",
                 "Missing Strict-Transport-Security header on HTTPS start URL.",
             );
@@ -100,6 +103,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("hsts", false, 10);
             this.registerWarning(
                 ctx,
+                "security",
                 "INVALID_HSTS",
                 'Strict-Transport-Security header is present but missing a valid "max-age" directive.',
                 { value },
@@ -111,6 +115,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("hsts", false, 10);
             this.registerWarning(
                 ctx,
+                "security",
                 "WEAK_HSTS_MAX_AGE",
                 `Strict-Transport-Security max-age is lower than one year (${maxAge}).`,
                 { value, maxAge },
@@ -138,6 +143,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             if (!hasCoreDirectives) {
                 this.registerWarning(
                     ctx,
+                    "security",
                     "WEAK_CSP",
                     "Content-Security-Policy header is present but does not define default-src or script-src.",
                     { value: enforced },
@@ -151,6 +157,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("csp", false, 20);
             this.registerWarning(
                 ctx,
+                "security",
                 "CSP_REPORT_ONLY_ONLY",
                 "Only Content-Security-Policy-Report-Only is present; no enforced Content-Security-Policy header was found.",
                 { value: reportOnly },
@@ -159,7 +166,12 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
         }
 
         this.addScore("csp", false, 20);
-        this.registerError(ctx, "MISSING_CSP", "Missing Content-Security-Policy header.");
+        this.registerError(
+            ctx,
+            "security",
+            "MISSING_CSP",
+            "Missing Content-Security-Policy header.",
+        );
     }
 
     private auditFrameProtection(ctx: ResourceContext, headers: Record<string, string>): void {
@@ -171,6 +183,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("clickjacking", false, 10);
             this.registerWarning(
                 ctx,
+                "security",
                 "MISSING_CLICKJACKING_PROTECTION",
                 "Missing both X-Frame-Options and CSP frame-ancestors protections.",
             );
@@ -184,6 +197,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             if (!["DENY", "SAMEORIGIN"].includes(normalized)) {
                 this.registerWarning(
                     ctx,
+                    "security",
                     "WEAK_X_FRAME_OPTIONS",
                     "X-Frame-Options header is present but has an uncommon value.",
                     { value: xfo },
@@ -207,6 +221,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("nosniff", false, 10);
             this.registerWarning(
                 ctx,
+                "security",
                 "MISSING_X_CONTENT_TYPE_OPTIONS",
                 "Missing X-Content-Type-Options header.",
             );
@@ -217,6 +232,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("nosniff", false, 10);
             this.registerWarning(
                 ctx,
+                "security",
                 "INVALID_X_CONTENT_TYPE_OPTIONS",
                 'X-Content-Type-Options header should usually be set to "nosniff".',
                 { value },
@@ -232,7 +248,12 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
 
         if (!value) {
             this.addScore("referrer-policy", false, 8);
-            this.registerWarning(ctx, "MISSING_REFERRER_POLICY", "Missing Referrer-Policy header.");
+            this.registerWarning(
+                ctx,
+                "security",
+                "MISSING_REFERRER_POLICY",
+                "Missing Referrer-Policy header.",
+            );
             return;
         }
 
@@ -253,6 +274,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("referrer-policy", false, 8);
             this.registerWarning(
                 ctx,
+                "security",
                 "INVALID_REFERRER_POLICY",
                 "Referrer-Policy header is present but has an unrecognized value.",
                 { value },
@@ -264,6 +286,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("referrer-policy", false, 8);
             this.registerWarning(
                 ctx,
+                "security",
                 "WEAK_REFERRER_POLICY",
                 'Referrer-Policy is set to "unsafe-url", which is generally too permissive.',
                 { value },
@@ -281,6 +304,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
             this.addScore("permissions-policy", false, 6);
             this.registerInfo(
                 ctx,
+                "security",
                 "MISSING_PERMISSIONS_POLICY",
                 "Permissions-Policy header is not present.",
             );
@@ -303,6 +327,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
         if (!coop) {
             this.registerInfo(
                 ctx,
+                "security",
                 "MISSING_COOP",
                 "Cross-Origin-Opener-Policy header is not present.",
             );
@@ -311,6 +336,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
         if (!corp) {
             this.registerInfo(
                 ctx,
+                "security",
                 "MISSING_CORP",
                 "Cross-Origin-Resource-Policy header is not present.",
             );
@@ -341,6 +367,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
                 allCookiesDefensive = false;
                 this.registerWarning(
                     ctx,
+                    "security",
                     "COOKIE_MISSING_SECURE",
                     `Cookie "${cookie.name}" is missing the Secure attribute on an HTTPS response.`,
                     { cookie: cookie.raw },
@@ -351,6 +378,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
                 allCookiesDefensive = false;
                 this.registerWarning(
                     ctx,
+                    "security",
                     "COOKIE_MISSING_HTTPONLY",
                     `Cookie "${cookie.name}" is missing the HttpOnly attribute.`,
                     { cookie: cookie.raw },
@@ -361,6 +389,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
                 allCookiesDefensive = false;
                 this.registerWarning(
                     ctx,
+                    "security",
                     "COOKIE_MISSING_SAMESITE",
                     `Cookie "${cookie.name}" is missing the SameSite attribute.`,
                     { cookie: cookie.raw },
@@ -369,6 +398,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
                 allCookiesDefensive = false;
                 this.registerWarning(
                     ctx,
+                    "security",
                     "COOKIE_INVALID_SAMESITE",
                     `Cookie "${cookie.name}" has an invalid SameSite attribute.`,
                     { cookie: cookie.raw, sameSite },
@@ -377,6 +407,7 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
                 allCookiesDefensive = false;
                 this.registerWarning(
                     ctx,
+                    "security",
                     "COOKIE_SAMESITE_NONE_WITHOUT_SECURE",
                     `Cookie "${cookie.name}" uses SameSite=None without Secure.`,
                     { cookie: cookie.raw },
@@ -407,16 +438,28 @@ export class SecurityHeadersPlugin extends BasePlugin implements IPlugin {
         const summary = `HTTP security score for the start URL: ${score}/100 (${grade}).`;
 
         if (score >= 90) {
-            this.registerInfo(ctx, "SECURITY_HEADERS_SCORE", summary, { score, grade, details });
+            this.registerInfo(ctx, "security", "SECURITY_HEADERS_SCORE", summary, {
+                score,
+                grade,
+                details,
+            });
             return;
         }
 
         if (score >= 70) {
-            this.registerWarning(ctx, "SECURITY_HEADERS_SCORE", summary, { score, grade, details });
+            this.registerWarning(ctx, "security", "SECURITY_HEADERS_SCORE", summary, {
+                score,
+                grade,
+                details,
+            });
             return;
         }
 
-        this.registerError(ctx, "SECURITY_HEADERS_SCORE", summary, { score, grade, details });
+        this.registerError(ctx, "security", "SECURITY_HEADERS_SCORE", summary, {
+            score,
+            grade,
+            details,
+        });
     }
 
     private gradeFromScore(score: number): string {

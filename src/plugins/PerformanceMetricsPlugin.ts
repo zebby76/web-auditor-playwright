@@ -236,6 +236,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
 
         this.registerInfo(
             ctx,
+            "performance",
             "PERFORMANCE_MEASURED",
             "Collected basic page performance metrics.",
             performanceData,
@@ -247,6 +248,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
         ) {
             this.registerWarning(
                 ctx,
+                "performance",
                 "SLOW_DOM_CONTENT_LOADED",
                 `DOMContentLoaded is slow (${Math.round(navigation.domContentLoadedMs)} ms).`,
                 { domContentLoadedMs: navigation.domContentLoadedMs },
@@ -256,6 +258,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
         if (typeof navigation.loadMs === "number" && navigation.loadMs > this.slowLoadThresholdMs) {
             this.registerWarning(
                 ctx,
+                "performance",
                 "SLOW_PAGE_LOAD",
                 `Page load is slow (${Math.round(navigation.loadMs)} ms).`,
                 { loadMs: navigation.loadMs },
@@ -265,6 +268,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
         if (resources.length > this.highResourceCountThreshold) {
             this.registerWarning(
                 ctx,
+                "performance",
                 "HIGH_RESOURCE_COUNT",
                 `Page loads a high number of resources (${resources.length}).`,
                 { resourceCount: resources.length },
@@ -274,6 +278,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
         if (totalTransferSize > this.largeTransferThresholdBytes) {
             this.registerWarning(
                 ctx,
+                "performance",
                 "LARGE_TOTAL_TRANSFER_SIZE",
                 `Page transfers a large amount of data (${totalTransferSize} bytes).`,
                 { totalTransferSize },
@@ -283,6 +288,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
         if (failedResources.length > 0) {
             this.registerWarning(
                 ctx,
+                "performance",
                 "FAILED_RESOURCES_DETECTED",
                 `Detected ${failedResources.length} failed resource request(s).`,
                 {
@@ -300,6 +306,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
         if (slowResources.length > 0) {
             this.registerInfo(
                 ctx,
+                "performance",
                 "SLOW_RESOURCES_DETECTED",
                 `Detected ${slowResources.length} slow resource(s).`,
                 { slowResources: performanceData.slowestResources },
@@ -309,6 +316,7 @@ export class PerformanceMetricsPlugin extends BasePlugin implements IPlugin {
         if (largeResources.length > 0) {
             this.registerInfo(
                 ctx,
+                "performance",
                 "LARGE_RESOURCES_DETECTED",
                 `Detected ${largeResources.length} large resource(s).`,
                 { largeResources: performanceData.largestResources },

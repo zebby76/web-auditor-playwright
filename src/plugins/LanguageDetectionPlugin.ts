@@ -45,6 +45,7 @@ export class LanguageDetectionPlugin extends BasePlugin implements IPlugin {
         if (sample.length < this.minLength) {
             this.registerInfo(
                 ctx,
+                "content",
                 "LANGUAGE_DETECTION_SKIPPED",
                 `Language detection skipped because the content is shorter than ${this.minLength} characters.`,
             );
@@ -56,6 +57,7 @@ export class LanguageDetectionPlugin extends BasePlugin implements IPlugin {
         if (lang3 === "und") {
             this.registerInfo(
                 ctx,
+                "technical",
                 "LANGUAGE_UNDETERMINED",
                 "Unable to determine content language.",
             );

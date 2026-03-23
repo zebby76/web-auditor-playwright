@@ -55,6 +55,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
         if (phase === "error") {
             this.registerWarning(
                 ctx,
+                "network",
                 "IP_SUPPORT_NOT_AUDITED",
                 "IP support could not be audited because the start URL failed to load.",
                 { targetUrl },
@@ -69,6 +70,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
         } catch {
             this.registerWarning(
                 ctx,
+                "network",
                 "IP_SUPPORT_INVALID_URL",
                 "IP support audit skipped because the URL is invalid.",
                 { targetUrl },
@@ -135,6 +137,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
 
         this.registerInfo(
             ctx,
+            "network",
             "IP_SUPPORT_DETAILS",
             "IP version support details collected for the start URL.",
             result,
@@ -143,6 +146,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
         if (result.ipv4.supported) {
             this.registerInfo(
                 ctx,
+                "network",
                 "IPV4_SUPPORTED",
                 `The hostname resolves to ${result.ipv4.addresses.length} IPv4 address(es).`,
                 result.ipv4,
@@ -150,6 +154,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
         } else {
             this.registerWarning(
                 ctx,
+                "network",
                 "IPV4_MISSING",
                 "The hostname does not resolve to any IPv4 address.",
                 result.ipv4,
@@ -159,6 +164,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
         if (result.ipv6.supported) {
             this.registerInfo(
                 ctx,
+                "network",
                 "IPV6_SUPPORTED",
                 `The hostname resolves to ${result.ipv6.addresses.length} IPv6 address(es).`,
                 result.ipv6,
@@ -166,6 +172,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
         } else {
             this.registerWarning(
                 ctx,
+                "network",
                 "IPV6_MISSING",
                 "The hostname does not resolve to any IPv6 address.",
                 result.ipv6,
@@ -176,6 +183,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
             if (result.ipv4.supported && result.ipv4.reachable === false) {
                 this.registerWarning(
                     ctx,
+                    "network",
                     "IPV4_UNREACHABLE",
                     "IPv4 is published in DNS but the TCP connection test failed.",
                     result.ipv4,
@@ -185,6 +193,7 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
             if (result.ipv6.supported && result.ipv6.reachable === false) {
                 this.registerWarning(
                     ctx,
+                    "network",
                     "IPV6_UNREACHABLE",
                     "IPv6 is published in DNS but the TCP connection test failed.",
                     result.ipv6,

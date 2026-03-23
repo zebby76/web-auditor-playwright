@@ -162,8 +162,25 @@ export type InventoryItem = {
     url: string;
 };
 
+export type FindingCategory =
+    | "a11y"
+    | "seo"
+    | "performance"
+    | "security"
+    | "network"
+    | "content"
+    | "html"
+    | "links"
+    | "resources"
+    | "technical"
+    | "best-practices"
+    | "compliance"
+    | "crawl"
+    | "plugins";
+
 export type Finding = {
     plugin: string;
+    category: FindingCategory;
     type: FindingSeverity;
     code: string;
     message: string;

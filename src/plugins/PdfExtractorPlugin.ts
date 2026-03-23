@@ -57,6 +57,7 @@ export class PdfExtractorPlugin extends BasePlugin implements IPlugin {
         if (size > this.maxFileSizeBytes) {
             this.registerWarning(
                 ctx,
+                "content",
                 "PDF_EXTRACTION_SKIPPED_TOO_LARGE",
                 `PDF extraction skipped because the file is larger than ${this.maxFileSizeBytes} bytes.`,
             );
@@ -74,6 +75,7 @@ export class PdfExtractorPlugin extends BasePlugin implements IPlugin {
                 if (!text) {
                     this.registerWarning(
                         ctx,
+                        "content",
                         "PDF_NO_TEXT",
                         "No usable text was extracted from PDF.",
                     );
@@ -81,6 +83,7 @@ export class PdfExtractorPlugin extends BasePlugin implements IPlugin {
                 if (text === "") {
                     this.registerWarning(
                         ctx,
+                        "content",
                         "PDF_EMPTY_TEXT",
                         "Empty text was extracted from PDF.",
                     );
@@ -95,6 +98,7 @@ export class PdfExtractorPlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerWarning(
                 ctx,
+                "plugins",
                 "PDF_EXTRACTION_FAILED",
                 ErrorUtils.errorMessage("Failed to extract PDF metadata and links", error),
             );

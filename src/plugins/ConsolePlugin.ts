@@ -142,6 +142,7 @@ export class ConsolePlugin extends BasePlugin implements IPlugin {
         if (errors.length > 0) {
             this.registerError(
                 ctx,
+                "technical",
                 "CONSOLE_ERRORS_DETECTED",
                 `Detected ${errors.length} unique console error(s).`,
                 { errors },
@@ -151,6 +152,7 @@ export class ConsolePlugin extends BasePlugin implements IPlugin {
         if (warnings.length > 0) {
             this.registerWarning(
                 ctx,
+                "technical",
                 "CONSOLE_WARNINGS_DETECTED",
                 `Detected ${warnings.length} unique console warning(s).`,
                 { warnings },

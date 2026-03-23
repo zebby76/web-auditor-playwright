@@ -75,6 +75,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 if (!title) {
                     this.registerWarning(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_TITLE_MISSING",
                         "PDF title metadata is missing.",
                     );
@@ -83,6 +84,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 if (!language) {
                     this.registerWarning(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_LANGUAGE_MISSING",
                         "PDF language metadata is missing.",
                     );
@@ -91,6 +93,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 if (textStats.totalCharacters < this.minExtractedChars) {
                     this.registerError(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_NO_EXTRACTABLE_TEXT",
                         "PDF does not appear to contain enough extractable text.",
                         {
@@ -107,6 +110,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 ) {
                     this.registerWarning(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_PROBABLY_SCANNED",
                         "PDF appears to be image-based or scanned because very little text could be extracted.",
                         {
@@ -120,6 +124,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 if (!hasBookmarks && textStats.pageCount >= this.warnOnMissingBookmarksMinPages) {
                     this.registerWarning(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_BOOKMARKS_MISSING",
                         "PDF has no bookmarks / outline.",
                         { pageCount: textStats.pageCount },
@@ -127,6 +132,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 } else if (!hasBookmarks) {
                     this.registerInfo(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_BOOKMARKS_NOT_REQUIRED",
                         "PDF has no bookmarks / outline, but the document is short.",
                         { pageCount: textStats.pageCount },
@@ -136,6 +142,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 if (ctx.report.links.length === 0) {
                     this.registerInfo(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_LINKS_NOT_DETECTED",
                         "No links were detected in the PDF.",
                     );
@@ -144,6 +151,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 if (tagging.isTagged) {
                     this.registerInfo(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_TAGGED",
                         "PDF appears to be tagged.",
                         tagging,
@@ -151,6 +159,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
                 } else {
                     this.registerWarning(
                         ctx,
+                        "a11y",
                         "PDF_ACCESSIBILITY_NOT_TAGGED",
                         "PDF does not appear to be tagged.",
                         tagging,
@@ -162,6 +171,7 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerWarning(
                 ctx,
+                "a11y",
                 "PDF_ACCESSIBILITY_AUDIT_FAILED",
                 this.errorMessage("Failed to audit PDF accessibility", error),
             );
@@ -283,10 +293,6 @@ export class PdfAccessibilityPlugin extends BasePlugin implements IPlugin {
             }
         }
         return null;
-    }
-
-    private normalizeLanguage(language: string): string {
-        return language.trim().toLowerCase();
     }
 
     private errorMessage(prefix: string, error: unknown): string {

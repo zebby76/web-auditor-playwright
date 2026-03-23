@@ -1,4 +1,5 @@
 import {
+    FindingCategory,
     FindingData,
     FindingSeverity,
     PluginSummary,
@@ -37,33 +38,37 @@ export abstract class BasePlugin {
 
     protected registerInfo(
         ctx: ResourceContext,
+        category: FindingCategory,
         code: string,
         message: string,
         data?: FindingData,
     ): void {
-        this.registerFinding("info", ctx, code, message, data);
+        this.registerFinding("info", category, ctx, code, message, data);
     }
 
     protected registerWarning(
         ctx: ResourceContext,
+        category: FindingCategory,
         code: string,
         message: string,
         data?: FindingData,
     ): void {
-        this.registerFinding("warning", ctx, code, message, data);
+        this.registerFinding("warning", category, ctx, code, message, data);
     }
 
     protected registerError(
         ctx: ResourceContext,
+        category: FindingCategory,
         code: string,
         message: string,
         data?: FindingData,
     ): void {
-        this.registerFinding("error", ctx, code, message, data);
+        this.registerFinding("error", category, ctx, code, message, data);
     }
 
     protected registerFinding(
         severity: FindingSeverity,
+        category: FindingCategory,
         ctx: ResourceContext,
         code: string,
         message: string,
@@ -72,6 +77,7 @@ export abstract class BasePlugin {
         this.addAuditor(ctx);
         ctx.findings.push({
             plugin: this.name,
+            category,
             type: severity,
             code,
             message,

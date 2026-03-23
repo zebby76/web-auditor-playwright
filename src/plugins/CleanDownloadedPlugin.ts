@@ -27,6 +27,7 @@ export class CleanDownloadedPlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerWarning(
                 ctx,
+                "technical",
                 "DOWNLOADED_FILE_CLEANUP_FAILED",
                 ErrorUtils.errorMessage("Failed to remove temporary downloaded file", error),
             );

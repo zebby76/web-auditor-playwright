@@ -35,6 +35,7 @@ export class PluginRegistry {
             } catch (e) {
                 ctx.findings.push({
                     plugin: plugin.name,
+                    category: "plugins",
                     type: "error",
                     code: "UNEXPECTED_ERROR",
                     message: ErrorUtils.errorMessage("Failed to run the plugin", e),

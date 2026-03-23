@@ -38,6 +38,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
         if (mailOrTelLinkCount > 0) {
             this.registerInfo(
                 ctx,
+                "content",
                 "MAIL_OR_TEL_LINK",
                 `Contains ${mailOrTelLinkCount} mailto or tel link(s).`,
                 {
@@ -49,7 +50,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
         }
 
         for (const issue of titleAnalysis.issues) {
-            this.registerFinding(issue.severity, ctx, issue.code, issue.message, {
+            this.registerFinding(issue.severity, "content", ctx, issue.code, issue.message, {
                 title: titleAnalysis.normalized,
                 length: titleAnalysis.length,
                 brand: titleAnalysis.brand,
@@ -59,7 +60,12 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
 
         const wordCount = extracted.content.split(/\s+/).length;
         if (wordCount < 100) {
-            this.registerWarning(ctx, "LOW_CONTENT", `Low content page (${wordCount} words).`);
+            this.registerWarning(
+                ctx,
+                "content",
+                "LOW_CONTENT",
+                `Low content page (${wordCount} words).`,
+            );
         }
 
         ctx.report.is_web = true;
@@ -167,7 +173,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
         });
 
         for (const finding of result.findings) {
-            this.registerFinding(finding.type, ctx, finding.code, finding.message);
+            this.registerFinding(finding.type, "content", ctx, finding.code, finding.message);
         }
 
         return {

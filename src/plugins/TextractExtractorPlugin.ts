@@ -56,6 +56,7 @@ export class TextractExtractorPlugin extends BasePlugin implements IPlugin {
         if (typeof size === "number" && size > this.maxFileSizeBytes) {
             this.registerWarning(
                 ctx,
+                "content",
                 "TEXTRACT_EXTRACTION_SKIPPED_TOO_LARGE",
                 `Textract extraction skipped because the file is larger than ${this.maxFileSizeBytes} bytes.`,
             );
@@ -69,6 +70,7 @@ export class TextractExtractorPlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerWarning(
                 ctx,
+                "plugins",
                 "TEXTRACT_DEPENDENCY_MISSING",
                 ErrorUtils.errorMessage('Missing optional dependency "textract"', error),
             );
@@ -92,6 +94,7 @@ export class TextractExtractorPlugin extends BasePlugin implements IPlugin {
             if (!text) {
                 this.registerInfo(
                     ctx,
+                    "content",
                     "TEXTRACT_NO_CONTENT",
                     `Textract did not extract any usable text${mime ? ` from ${mime}` : ""}.`,
                 );
@@ -115,6 +118,7 @@ export class TextractExtractorPlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerWarning(
                 ctx,
+                "plugins",
                 "TEXT_EXTRACTION_FAILED",
                 ErrorUtils.errorMessage("Textract extraction failed", error),
             );
