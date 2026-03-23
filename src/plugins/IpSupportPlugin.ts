@@ -192,6 +192,11 @@ export class IpSupportPlugin extends BasePlugin implements IPlugin {
             }
         }
 
+        ctx.engineState.ipV4Supported = result.ipv4.supported;
+        ctx.engineState.ipV6Supported = result.ipv6.supported;
+        ctx.engineState.ipV4Reachable = result.ipv4.reachable ?? undefined;
+        ctx.engineState.ipV6Reachable = result.ipv6.reachable ?? undefined;
+
         this.register(ctx);
     }
 

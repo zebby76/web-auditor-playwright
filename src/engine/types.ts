@@ -148,6 +148,10 @@ export type EngineState = {
     inventory: InventoryItem[];
     securityHeaderGrade?: string;
     securityHeaderScore?: number;
+    ipV4Supported?: boolean;
+    ipV6Supported?: boolean;
+    ipV4Reachable?: boolean;
+    ipV6Reachable?: boolean;
 };
 
 export type FindingSeverity = "info" | "warning" | "error";

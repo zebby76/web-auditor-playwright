@@ -26,6 +26,7 @@ import { PdfAccessibilityPlugin } from "./plugins/PdfAccessibilityPlugin.js";
 import { PerformanceMetricsPlugin } from "./plugins/PerformanceMetricsPlugin.js";
 import { TlsCertificatePlugin } from "./plugins/TlsCertificatePlugin.js";
 import { IpSupportPlugin } from "./plugins/IpSupportPlugin.js";
+import { TextUtils } from "./utils/TextUtils.js";
 
 async function main() {
     const reportOutputDir = process.env.REPORT_OUTPUT_DIR ?? "./reports";
@@ -208,6 +209,8 @@ async function main() {
 
     if (outputFormat === "table" || outputFormat === "both") {
         const securityHeader = `${state.securityHeaderGrade ?? "N/A"} (${state.securityHeaderScore ?? "N/A"}%)`;
+        const ipv4 = `supported ${TextUtils.statusLabel(state.ipV4Supported)} | reachable ${TextUtils.statusLabel(state.ipV4Reachable)} `;
+        const ipv6 = `supported ${TextUtils.statusLabel(state.ipV6Supported)} | reachable ${TextUtils.statusLabel(state.ipV6Reachable)} `;
         console.log("\n\n=== Audit completed ===\n");
         console.log(`  - Origin          : ${state.origin}`);
         console.log(`  - Started at      : ${state.startedAt.toISOString()}`);
@@ -215,6 +218,8 @@ async function main() {
         console.log(`  - Duration        : ${TimeUtils.formatHuman(durationMs)}`);
         console.log(`  - URLs seen       : ${state.seen.size}`);
         console.log(`  - Security header : ${securityHeader}`);
+        console.log(`  - IPv4            : ${ipv4}`);
+        console.log(`  - IPv6            : ${ipv6}`);
         printPluginSummaryTable(pluginSummaries);
     }
 

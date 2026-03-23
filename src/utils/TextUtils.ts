@@ -42,4 +42,10 @@ export class TextUtils {
 
         return null;
     }
+
+    static statusLabel(value: boolean | null | undefined): string {
+        if (value === true) return "✔ yes    ";
+        if (value === false) return "✖ no     ";
+        return "~ unknown";
+    }
 }
