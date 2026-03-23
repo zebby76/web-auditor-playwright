@@ -76,14 +76,10 @@ async function main() {
             new ConsolePlugin({
                 auditOnlyStartUrl: process.env.CONSOLE_AUDIT_ONLY_START_URL === "true",
                 includeWarnings: (process.env.CONSOLE_INCLUDE_WARNINGS ?? "true") === "true",
-                ignoredTextPatterns: (
+                ignoredTextPatterns: TextUtils.parseRegexList(
                     process.env.CONSOLE_IGNORED_PATTERNS ??
-                    "favicon\\.ico,chrome-extension:\\/\\/,Failed to load resource: .*"
-                )
-                    .split(",")
-                    .map((p) => p.trim())
-                    .filter((p) => p.length > 0)
-                    .map((p) => new RegExp(p, "i")),
+                        "favicon\\.ico,chrome-extension:\\/\\/,Failed to load resource: .*",
+                ),
             }),
         )
         .register(new ProcessHtmlPlugin())

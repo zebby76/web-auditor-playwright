@@ -48,4 +48,14 @@ export class TextUtils {
         if (value === false) return "✖ no     ";
         return "~ unknown";
     }
+
+    static parseRegexList(env?: string): RegExp[] {
+        return (
+            env
+                ?.split(",")
+                .map((s) => s.trim())
+                .filter((p) => p.length > 0)
+                .map((pattern) => new RegExp(pattern)) ?? []
+        );
+    }
 }
