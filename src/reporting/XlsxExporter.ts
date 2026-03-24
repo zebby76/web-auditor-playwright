@@ -21,6 +21,7 @@ export interface PluginSummary {
 export interface IssueEntry {
     plugin: string;
     type: "info" | "warning" | "error" | string;
+    category: string;
     code: string;
     message: string;
     url?: string;
@@ -135,6 +136,7 @@ export class XlsxExporter {
         ws.columns = [
             { header: "plugin", key: "plugin", width: 24 },
             { header: "type", key: "type", width: 10 },
+            { header: "category", key: "category", width: 10 },
             { header: "code", key: "code", width: 34 },
             { header: "message", key: "message", width: 70 },
             { header: "url", key: "url", width: 70 },
@@ -145,6 +147,7 @@ export class XlsxExporter {
             const row = ws.addRow({
                 plugin: issue.plugin,
                 type: issue.type,
+                category: issue.category,
                 code: issue.code,
                 message: issue.message,
                 url: issue.url ?? "",
