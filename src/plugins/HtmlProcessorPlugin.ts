@@ -51,7 +51,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
         }
 
         for (const issue of titleAnalysis.issues) {
-            this.registerFinding(issue.severity, "content", ctx, issue.code, issue.message, {
+            this.registerFinding(issue.severity, "seo", ctx, issue.code, issue.message, {
                 title: titleAnalysis.normalized,
                 length: titleAnalysis.length,
                 brand: titleAnalysis.brand,
