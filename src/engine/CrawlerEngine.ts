@@ -190,7 +190,7 @@ export class CrawlerEngine {
                 } else {
                     ctx.findings.push({
                         plugin: "engine",
-                        category: "crawl",
+                        category: "network",
                         type: "error",
                         code: "NAVIGATION_FAILED",
                         message: ErrorUtils.errorMessage("Failed to open or download the url", e),
@@ -213,7 +213,7 @@ export class CrawlerEngine {
                     state.warningCount += 1;
                     ctx.findings.push({
                         plugin: "engine",
-                        category: "plugins",
+                        category: "resources",
                         type: "warning",
                         code: "URL_NOT_AUDITED",
                         message: "This URL is not supported",

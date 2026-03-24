@@ -1,4 +1,5 @@
 import {
+    FindingCategory,
     FindingSeverity,
     IPlugin,
     PluginPhase,
@@ -38,7 +39,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
         if (mailOrTelLinkCount > 0) {
             this.registerInfo(
                 ctx,
-                "content",
+                "links",
                 "MAIL_OR_TEL_LINK",
                 `Contains ${mailOrTelLinkCount} mailto or tel link(s).`,
                 {
@@ -105,7 +106,12 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
 
             const elements = Array.from(document.querySelectorAll("[href], [src]"));
             const links: ResourceReportLink[] = [];
-            const findings: Array<{ type: FindingSeverity; code: string; message: string }> = [];
+            const findings: Array<{
+                type: FindingSeverity;
+                category: FindingCategory;
+                code: string;
+                message: string;
+            }> = [];
 
             for (const el of elements) {
                 let url: string | null = null;
@@ -119,6 +125,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
                 if (!url) {
                     findings.push({
                         type: "warning",
+                        category: "html",
                         code: "MISSING_URL",
                         message: `Tag ${el.tagName.toLowerCase()} with missing link attribute (href or src).`,
                     });
@@ -130,6 +137,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
                 if (url === "") {
                     findings.push({
                         type: "warning",
+                        category: "links",
                         code: "EMPTY_URL",
                         message: `Tag ${el.tagName.toLowerCase()} with an empty link attribute (href or src).`,
                     });
@@ -142,6 +150,7 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
                 } catch {
                     findings.push({
                         type: "error",
+                        category: "links",
                         code: "NOT_PARSABLE_URL",
                         message: `URL ${url} is not parsable.`,
                     });
@@ -173,7 +182,13 @@ export class HtmlProcessorPlugin extends BasePlugin implements IPlugin {
         });
 
         for (const finding of result.findings) {
-            this.registerFinding(finding.type, "content", ctx, finding.code, finding.message);
+            this.registerFinding(
+                finding.type,
+                finding.category,
+                ctx,
+                finding.code,
+                finding.message,
+            );
         }
 
         return {

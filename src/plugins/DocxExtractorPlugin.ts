@@ -55,7 +55,7 @@ export class DocxExtractorPlugin extends BasePlugin implements IPlugin {
         if (size > this.maxFileSizeBytes) {
             this.registerWarning(
                 ctx,
-                "content",
+                "resources",
                 "DOCX_EXTRACTION_SKIPPED_TOO_LARGE",
                 `DOCX extraction skipped because the file is larger than ${this.maxFileSizeBytes} bytes.`,
             );
@@ -80,7 +80,7 @@ export class DocxExtractorPlugin extends BasePlugin implements IPlugin {
         } catch (error) {
             this.registerWarning(
                 ctx,
-                "content",
+                "plugins",
                 "TEXT_EXTRACTION_FAILED",
                 ErrorUtils.errorMessage("DOCX extraction failed", error),
             );

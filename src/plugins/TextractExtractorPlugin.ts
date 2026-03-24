@@ -56,7 +56,7 @@ export class TextractExtractorPlugin extends BasePlugin implements IPlugin {
         if (typeof size === "number" && size > this.maxFileSizeBytes) {
             this.registerWarning(
                 ctx,
-                "content",
+                "resources",
                 "TEXTRACT_EXTRACTION_SKIPPED_TOO_LARGE",
                 `Textract extraction skipped because the file is larger than ${this.maxFileSizeBytes} bytes.`,
             );

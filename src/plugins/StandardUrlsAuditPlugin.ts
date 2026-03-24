@@ -82,7 +82,7 @@ export class StandardUrlsAuditPlugin extends BasePlugin implements IPlugin {
             if (!result.accepted) {
                 this.registerInfo(
                     ctx,
-                    "best-practices",
+                    "crawl",
                     "STANDARD_URL_NOT_ENQUEUED",
                     `Did not queue standard URL: ${spec.path} (${result.reason ?? "unknown"}).`,
                     {

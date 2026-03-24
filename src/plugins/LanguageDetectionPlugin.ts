@@ -57,7 +57,7 @@ export class LanguageDetectionPlugin extends BasePlugin implements IPlugin {
         if (lang3 === "und") {
             this.registerInfo(
                 ctx,
-                "technical",
+                "content",
                 "LANGUAGE_UNDETERMINED",
                 "Unable to determine content language.",
             );

@@ -66,7 +66,7 @@ export class DownloaderPlugin extends BasePlugin implements IPlugin {
                 } else {
                     this.registerError(
                         ctx,
-                        "technical",
+                        "network",
                         "DOWNLOAD_FAILED",
                         ErrorUtils.errorMessage(
                             "Failed to fetch inline resource",
@@ -80,7 +80,7 @@ export class DownloaderPlugin extends BasePlugin implements IPlugin {
             ctx.report.message = "Unable to download file";
             this.registerError(
                 ctx,
-                "technical",
+                "network",
                 "DOWNLOAD_FAILED",
                 ErrorUtils.errorMessage(ctx.report.message, error),
             );
@@ -128,7 +128,7 @@ export class DownloaderPlugin extends BasePlugin implements IPlugin {
         if (!detection.mime) {
             this.registerWarning(
                 ctx,
-                "technical",
+                "resources",
                 "MIME_UNKNOWN",
                 `Unable to determine MIME type for "${suggestedFilename}".`,
             );
