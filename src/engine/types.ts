@@ -124,8 +124,6 @@ export type EnqueueResult = {
 
 export type CrawlerControl = {
     enqueueUrl: (request: EnqueueRequest) => EnqueueResult;
-    requestStop: () => void;
-    isStopRequested: () => boolean;
 };
 
 export type EngineState = {

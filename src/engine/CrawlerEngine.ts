@@ -106,10 +106,6 @@ export class CrawlerEngine {
                             start,
                         );
                     },
-                    requestStop: (): void => {
-                        this.requestStop();
-                    },
-                    isStopRequested: (): boolean => this.isStopRequested(),
                 },
                 report: createInitialReport({
                     url: item.url,
