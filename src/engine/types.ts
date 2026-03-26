@@ -305,12 +305,19 @@ export type PluginPhase =
     | "beforeFinally"
     | "finally";
 
+export type ReportItem = {
+    key: string;
+    label: string;
+    value: string | number | boolean;
+};
+
 export type PluginSummary = {
     plugin: string;
     treatedUrls: number;
     infos: number;
     warnings: number;
     errors: number;
+    report: ReportItem[];
 };
 
 export interface IPlugin {
@@ -320,4 +327,5 @@ export interface IPlugin {
     run(phase: PluginPhase, ctx: ResourceContext): Promise<void>;
     includeInSummary?(): boolean;
     getSummary?(): PluginSummary | null;
+    getReport(): ReportItem[];
 }

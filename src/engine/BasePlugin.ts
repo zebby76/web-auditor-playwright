@@ -4,6 +4,7 @@ import {
     FindingData,
     FindingSeverity,
     PluginSummary,
+    ReportItem,
     ResourceContext,
     ResourceReportLink,
 } from "./types.js";
@@ -30,6 +31,7 @@ export abstract class BasePlugin {
             infos: this.infos,
             warnings: this.warnings,
             errors: this.errors,
+            report: this.getReport(),
         };
     }
 
@@ -144,5 +146,9 @@ export abstract class BasePlugin {
         }
         ctx.auditors.push(this.name);
         this.treatedUrls += 1;
+    }
+
+    public getReport(): ReportItem[] {
+        return [];
     }
 }

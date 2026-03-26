@@ -222,6 +222,7 @@ async function main() {
         infos: state.infoCount,
         errors: state.errorCount,
         warnings: state.warningCount,
+        report: [],
     });
     const endedAt = new Date();
     const durationMs = endedAt.getTime() - state.startedAt.getTime();
