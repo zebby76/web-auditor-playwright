@@ -29,6 +29,7 @@ import { TlsCertificatePlugin } from "./plugins/TlsCertificatePlugin.js";
 import { IpSupportPlugin } from "./plugins/IpSupportPlugin.js";
 import { TextUtils } from "./utils/TextUtils.js";
 import { XlsxExporter } from "./reporting/XlsxExporter.js";
+import { Report } from "./engine/types.js";
 
 async function main() {
     const reportOutputDir = process.env.REPORT_OUTPUT_DIR ?? "./reports";
@@ -214,9 +215,56 @@ async function main() {
     } finally {
         stopController.stop();
     }
+    const endedAt = new Date();
+    const durationMs = endedAt.getTime() - state.startedAt.getTime();
 
     const pluginSummaries = registry.getSummaries();
-    const reports = registry.getReports(state);
+    const engineReport = {
+        plugin: "engine",
+        label: "Crawler",
+        items: [
+            {
+                key: "origin",
+                label: "Origin",
+                value: state.origin,
+            },
+            {
+                key: "startedAt",
+                label: "Started at",
+                value: state.startedAt.toISOString(),
+            },
+            {
+                key: "endedAt",
+                label: "Ended at",
+                value: endedAt.toISOString(),
+            },
+            {
+                key: "duration",
+                label: "Duration",
+                value: TimeUtils.formatHuman(durationMs),
+            },
+            {
+                key: "urlsSeen",
+                label: "URLs seen",
+                value: state.seen.size,
+            },
+            {
+                key: "stopRequested",
+                label: "Stop Requested",
+                value: state.stopRequested,
+            },
+        ],
+    };
+    if (state.stopConfirmedAt) {
+        engineReport.items.push({
+            key: "stopConfirmedAt",
+            label: "Stop Confirmed ",
+            value: state.stopConfirmedAt,
+        });
+    }
+    const reports: Report[] = [engineReport];
+    reports.push(...registry.getReports(state));
+
     pluginSummaries.push({
         plugin: "engine",
         treatedUrls: state.seen.size,
@@ -224,31 +272,25 @@ async function main() {
         errors: state.errorCount,
         warnings: state.warningCount,
     });
-    const endedAt = new Date();
-    const durationMs = endedAt.getTime() - state.startedAt.getTime();
 
     if (outputFormat === "table" || outputFormat === "both") {
-        const ipv4 = `supported ${TextUtils.statusLabel(state.ipV4Supported)} | reachable ${TextUtils.statusLabel(state.ipV4Reachable)} `;
-        const ipv6 = `supported ${TextUtils.statusLabel(state.ipV6Supported)} | reachable ${TextUtils.statusLabel(state.ipV6Reachable)} `;
-        console.log("\n\n=== Audit completed ===\n");
-        console.log(`  - Origin           : ${state.origin}`);
-        console.log(`  - Started at       : ${state.startedAt.toISOString()}`);
-        console.log(`  - Ended at         : ${endedAt.toISOString()}`);
-        console.log(`  - Duration         : ${TimeUtils.formatHuman(durationMs)}`);
-        console.log(`  - Stop requested   : ${state.stopRequested ? "✔ yes" : "✖ no"}`);
-        console.log(`  - Stop confirmed   : ${state.stopConfirmedAt ?? ""}`);
-        console.log(`  - URLs seen        : ${state.seen.size}`);
-        console.log(`  - IPv4             : ${ipv4}`);
-        console.log(`  - IPv6             : ${ipv6}`);
+        console.log("\n\n=== Audit reports ===\n");
         for (const reportIndex in reports) {
             const report = reports[reportIndex];
             if (report.items.length === 0) {
                 continue;
             }
             console.log(` - ${report.label} (${report.plugin})`);
+            const labelLength =
+                report.items.reduce(
+                    (max, report) => (report.label.length > max ? report.label.length : max),
+                    0,
+                ) + 1;
             for (const itemIndex in report.items) {
                 const item = report.items[itemIndex];
-                console.log(`   - ${item.label} : ${item.value}`);
+                console.log(
+                    `   - ${item.label.padEnd(labelLength)} : ${typeof item.value === "boolean" ? (item.value ? "✔ yes" : "✖ no") : item.value}`,
+                );
             }
         }
         printPluginSummaryTable(pluginSummaries);
@@ -263,10 +305,6 @@ async function main() {
             stopConfirmedAt: state.stopConfirmedAt ?? null,
             origin: state.origin,
             seenCount: state.seen.size,
-            ipV4Supported: state.ipV4Supported ?? null,
-            ipV6Supported: state.ipV6Supported ?? null,
-            ipV4Reachable: state.ipV4Reachable ?? null,
-            ipV6Reachable: state.ipV6Reachable ?? null,
         },
         reports,
         plugins: pluginSummaries,
