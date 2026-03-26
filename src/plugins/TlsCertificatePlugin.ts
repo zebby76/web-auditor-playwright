@@ -660,7 +660,7 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
 
         return {
             plugin: this.name,
-            label: "TLS",
+            label: "TLS / Certificate",
             items,
         };
     }
