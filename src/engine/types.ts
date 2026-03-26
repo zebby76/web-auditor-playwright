@@ -311,6 +311,12 @@ export type ReportItem = {
     value: string | number | boolean;
 };
 
+export type Report = {
+    plugin: string;
+    label: string;
+    items: ReportItem[];
+};
+
 export type PluginSummary = {
     plugin: string;
     treatedUrls: number;
