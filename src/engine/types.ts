@@ -317,7 +317,6 @@ export type PluginSummary = {
     infos: number;
     warnings: number;
     errors: number;
-    report: ReportItem[];
 };
 
 export interface IPlugin {
@@ -327,5 +326,5 @@ export interface IPlugin {
     run(phase: PluginPhase, ctx: ResourceContext): Promise<void>;
     includeInSummary?(): boolean;
     getSummary?(): PluginSummary | null;
-    getReport(): ReportItem[];
+    getReport?(engineState: EngineState): Report;
 }

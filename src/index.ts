@@ -216,13 +216,13 @@ async function main() {
     }
 
     const pluginSummaries = registry.getSummaries();
+    const reports = registry.getReports(state);
     pluginSummaries.push({
         plugin: "engine",
         treatedUrls: state.seen.size,
         infos: state.infoCount,
         errors: state.errorCount,
         warnings: state.warningCount,
-        report: [],
     });
     const endedAt = new Date();
     const durationMs = endedAt.getTime() - state.startedAt.getTime();
@@ -247,6 +247,16 @@ async function main() {
         console.log(`    - Days remaining : ${state.tlsDaysRemaining}`);
         console.log(`  - IPv4             : ${ipv4}`);
         console.log(`  - IPv6             : ${ipv6}`);
+        for (const reportIndex in reports) {
+            const report = reports[reportIndex];
+            if (report.items.length === 0) {
+                continue;
+            }
+            for (const itemIndex in report.items) {
+                const item = report.items[itemIndex];
+                console.log(`   - ${item.label} : ${item.value}`);
+            }
+        }
         printPluginSummaryTable(pluginSummaries);
     }
 
@@ -271,6 +281,7 @@ async function main() {
             ipV4Reachable: state.ipV4Reachable ?? null,
             ipV6Reachable: state.ipV6Reachable ?? null,
         },
+        reports,
         plugins: pluginSummaries,
         issues: state.findings,
         inventory: state.inventory,
