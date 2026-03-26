@@ -78,7 +78,6 @@ The tool can be configured using [environment variables](#environment-variables)
 - JSON-LD structure
     - `@context": "https://schema.org"`
 - Check the format validity of email et tel links
-- black list errors envvar
 
 ## Installing Playwright and launch an audit locally
 
@@ -152,6 +151,7 @@ npm start
 | `USER_AGENT`                                | `undefined`                                                      | If defined, it will overwrite the Playright's user agent.                                                                                                                                                                                                               |
 | `IGNORE_HTTPS_ERRORS`                       | `false`                                                          | If set to true, Playwright ignores HTTPS certificate errors (e.g. self-signed or invalid certificates).                                                                                                                                                                 |
 | `DISABLED_PLUGINS`                          | empty                                                            | Comma-separated list of plugin names that must not be registered or executed. E.g. `ip-support,tls-certificate`.                                                                                                                                                        |
+| `FINDING_CODES_BLOCKLIST`                   | empty                                                            | Comma-separated list of finding codes to exclude from the report; any matching findings will be ignored. E.g. `MAIL_OR_TEL_LINK`.                                                                                                                                       |
 | `RATE_LIMIT_MS`                             | `500`                                                            | Minimum delay (in milliseconds) between navigation requests. This helps avoid overloading the target server.                                                                                                                                                            |
 | `NAV_TIMEOUT_MS`                            | `30000`                                                          | Maximum time (in milliseconds) allowed for page navigation before it is considered a failure.                                                                                                                                                                           |
 | `SAME_ORIGIN_ONLY`                          | `true`                                                           | If enabled, the crawler only follows links that belong to the same origin as the `START_URL`.                                                                                                                                                                           |
