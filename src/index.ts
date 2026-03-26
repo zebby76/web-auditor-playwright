@@ -4,7 +4,7 @@ import path from "node:path";
 import { PluginRegistry } from "./engine/PluginRegistry.js";
 import { CrawlerEngine } from "./engine/CrawlerEngine.js";
 import { GracefulStopController } from "./engine/GracefulStopController.js";
-import { printPluginSummaryTable } from "./engine/summaryPrinter.js";
+import { printPluginSummaryTable, printReports } from "./engine/outputPrinters.js";
 
 import { TimeUtils } from "./utils/TimeUtils.js";
 
@@ -29,6 +29,7 @@ import { TlsCertificatePlugin } from "./plugins/TlsCertificatePlugin.js";
 import { IpSupportPlugin } from "./plugins/IpSupportPlugin.js";
 import { TextUtils } from "./utils/TextUtils.js";
 import { XlsxExporter } from "./reporting/XlsxExporter.js";
+import { Report } from "./engine/types.js";
 
 async function main() {
     const reportOutputDir = process.env.REPORT_OUTPUT_DIR ?? "./reports";
@@ -214,8 +215,56 @@ async function main() {
     } finally {
         stopController.stop();
     }
+    const endedAt = new Date();
+    const durationMs = endedAt.getTime() - state.startedAt.getTime();
 
     const pluginSummaries = registry.getSummaries();
+    const engineReport = {
+        plugin: "engine",
+        label: "Crawler",
+        items: [
+            {
+                key: "origin",
+                label: "Origin",
+                value: state.origin,
+            },
+            {
+                key: "startedAt",
+                label: "Started at",
+                value: state.startedAt.toISOString(),
+            },
+            {
+                key: "endedAt",
+                label: "Ended at",
+                value: endedAt.toISOString(),
+            },
+            {
+                key: "duration",
+                label: "Duration",
+                value: TimeUtils.formatHuman(durationMs),
+            },
+            {
+                key: "urlsSeen",
+                label: "URLs seen",
+                value: state.seen.size,
+            },
+            {
+                key: "stopRequested",
+                label: "Stop Requested",
+                value: state.stopRequested,
+            },
+        ],
+    };
+    if (state.stopConfirmedAt) {
+        engineReport.items.push({
+            key: "stopConfirmedAt",
+            label: "Stop Confirmed ",
+            value: state.stopConfirmedAt,
+        });
+    }
+    const reports: Report[] = [engineReport];
+    reports.push(...registry.getReports(state));
+
     pluginSummaries.push({
         plugin: "engine",
         treatedUrls: state.seen.size,
@@ -223,53 +272,14 @@ async function main() {
         errors: state.errorCount,
         warnings: state.warningCount,
     });
-    const endedAt = new Date();
-    const durationMs = endedAt.getTime() - state.startedAt.getTime();
 
     if (outputFormat === "table" || outputFormat === "both") {
-        const securityHeader = `${state.securityHeaderGrade ?? "N/A"} (${state.securityHeaderScore ?? "N/A"}%)`;
-        const tlsGrade = `${state.tlsGrade ?? "N/A"} (${state.tlsScore ?? "N/A"}%)`;
-        const ipv4 = `supported ${TextUtils.statusLabel(state.ipV4Supported)} | reachable ${TextUtils.statusLabel(state.ipV4Reachable)} `;
-        const ipv6 = `supported ${TextUtils.statusLabel(state.ipV6Supported)} | reachable ${TextUtils.statusLabel(state.ipV6Reachable)} `;
-        console.log("\n\n=== Audit completed ===\n");
-        console.log(`  - Origin           : ${state.origin}`);
-        console.log(`  - Started at       : ${state.startedAt.toISOString()}`);
-        console.log(`  - Ended at         : ${endedAt.toISOString()}`);
-        console.log(`  - Duration         : ${TimeUtils.formatHuman(durationMs)}`);
-        console.log(`  - Stop requested   : ${state.stopRequested ? "✔ yes" : "✖ no"}`);
-        console.log(`  - Stop confirmed   : ${state.stopConfirmedAt ?? ""}`);
-        console.log(`  - URLs seen        : ${state.seen.size}`);
-        console.log(`  - Security header  : ${securityHeader}`);
-        console.log(`  - TLS              : ${tlsGrade}`);
-        console.log(`    - Valid from     : ${state.tlsValidFrom}`);
-        console.log(`    - Valid to       : ${state.tlsValidTo}`);
-        console.log(`    - Days remaining : ${state.tlsDaysRemaining}`);
-        console.log(`  - IPv4             : ${ipv4}`);
-        console.log(`  - IPv6             : ${ipv6}`);
+        printReports(reports);
         printPluginSummaryTable(pluginSummaries);
     }
 
     const globalReport = {
-        state: {
-            startedAt: state.startedAt.toISOString(),
-            endedAt: endedAt.toISOString(),
-            durationMs: durationMs,
-            stopRequested: state.stopRequested ?? false,
-            stopConfirmedAt: state.stopConfirmedAt ?? null,
-            origin: state.origin,
-            seenCount: state.seen.size,
-            securityGrade: state.securityHeaderGrade ?? null,
-            securityScore: state.securityHeaderScore ?? null,
-            tlsGrade: state.tlsGrade ?? null,
-            tlsScore: state.tlsScore ?? null,
-            tlsValidFrom: state.tlsValidFrom ?? null,
-            tlsValidTo: state.tlsValidTo ?? null,
-            tlsDaysRemaining: state.tlsDaysRemaining ?? null,
-            ipV4Supported: state.ipV4Supported ?? null,
-            ipV6Supported: state.ipV6Supported ?? null,
-            ipV4Reachable: state.ipV4Reachable ?? null,
-            ipV6Reachable: state.ipV6Reachable ?? null,
-        },
+        reports,
         plugins: pluginSummaries,
         issues: state.findings,
         inventory: state.inventory,

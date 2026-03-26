@@ -1,4 +1,11 @@
-import type { IPlugin, PluginPhase, PluginSummary, ResourceContext } from "./types.js";
+import type {
+    EngineState,
+    IPlugin,
+    PluginPhase,
+    PluginSummary,
+    Report,
+    ResourceContext,
+} from "./types.js";
 import { ErrorUtils } from "../utils/ErrorUtils.js";
 
 type PluginRegistryOptions = {
@@ -50,5 +57,12 @@ export class PluginRegistry {
             .filter((plugin) => plugin.includeInSummary?.() ?? false)
             .map((plugin) => plugin.getSummary?.())
             .filter((summary): summary is PluginSummary => summary !== null);
+    }
+
+    getReports(state: EngineState): Report[] {
+        return this.plugins
+            .filter((plugin) => plugin.getReport !== undefined)
+            .map((plugin) => plugin.getReport?.(state))
+            .filter((report): report is Report => report !== undefined);
     }
 }

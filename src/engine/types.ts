@@ -245,17 +245,6 @@ export type EngineState = {
     any: Record<string, unknown>;
     findings: Finding[];
     inventory: InventoryItem[];
-    securityHeaderGrade?: string;
-    securityHeaderScore?: number;
-    tlsGrade?: string;
-    tlsScore?: number;
-    tlsValidFrom?: string;
-    tlsValidTo?: string;
-    tlsDaysRemaining?: number;
-    ipV4Supported?: boolean;
-    ipV6Supported?: boolean;
-    ipV4Reachable?: boolean;
-    ipV6Reachable?: boolean;
     stopRequested: boolean;
     stopConfirmedAt?: string;
 };
@@ -305,6 +294,18 @@ export type PluginPhase =
     | "beforeFinally"
     | "finally";
 
+export type ReportItem = {
+    key: string;
+    label: string;
+    value: string | number | boolean;
+};
+
+export type Report = {
+    plugin: string;
+    label: string;
+    items: ReportItem[];
+};
+
 export type PluginSummary = {
     plugin: string;
     treatedUrls: number;
@@ -320,4 +321,5 @@ export interface IPlugin {
     run(phase: PluginPhase, ctx: ResourceContext): Promise<void>;
     includeInSummary?(): boolean;
     getSummary?(): PluginSummary | null;
+    getReport?(engineState: EngineState): Report;
 }
