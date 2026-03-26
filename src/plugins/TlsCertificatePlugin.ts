@@ -1,6 +1,6 @@
 import tls from "node:tls";
 import { BasePlugin } from "../engine/BasePlugin.js";
-import { IPlugin, PluginPhase, ResourceContext } from "../engine/types.js";
+import { EngineState, IPlugin, PluginPhase, Report, ResourceContext } from "../engine/types.js";
 import { TextUtils } from "../utils/TextUtils.js";
 
 type TlsCertificatePluginOptions = {
@@ -46,6 +46,14 @@ type TlsCertInfo = {
         weakCipher: boolean;
         chainTooShort: boolean;
     };
+};
+
+type TlsCertificateState = {
+    tlsGrade?: string;
+    tlsScore?: number;
+    tlsValidFrom?: string;
+    tlsValidTo?: string;
+    tlsDaysRemaining?: number;
 };
 
 export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
@@ -119,15 +127,15 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
 
         const host = parsedUrl.hostname;
         const port = parsedUrl.port ? Number(parsedUrl.port) : 443;
-        const servername = host;
 
         try {
-            const cert = await this.inspectCertificate(host, port, servername);
-            ctx.engineState.tlsGrade = cert.grade;
-            ctx.engineState.tlsScore = cert.score;
-            ctx.engineState.tlsValidFrom = cert.validFrom ?? undefined;
-            ctx.engineState.tlsValidTo = cert.validTo ?? undefined;
-            ctx.engineState.tlsDaysRemaining = cert.daysRemaining ?? undefined;
+            const cert = await this.inspectCertificate(host, port, host);
+            const state = this.getState(ctx.engineState);
+            state.tlsGrade = cert.grade;
+            state.tlsScore = cert.score;
+            state.tlsValidFrom = cert.validFrom ?? undefined;
+            state.tlsValidTo = cert.validTo ?? undefined;
+            state.tlsDaysRemaining = cert.daysRemaining ?? undefined;
 
             this.registerInfo(
                 ctx,
@@ -581,5 +589,79 @@ export class TlsCertificatePlugin extends BasePlugin implements IPlugin {
         }
 
         return depth;
+    }
+
+    private getState(state: EngineState): TlsCertificateState {
+        const existing = state.any[this.name];
+        if (this.isTlsCertificateState(existing)) {
+            return existing;
+        }
+
+        const created: TlsCertificateState = {};
+        state.any[this.name] = created;
+        return created;
+    }
+
+    private isTlsCertificateState(value: unknown): value is TlsCertificateState {
+        if (!value || typeof value !== "object") {
+            return false;
+        }
+
+        const record = value as Record<string, unknown>;
+        return (
+            (typeof record.tlsGrade === "string" || typeof record.tlsGrade === "undefined") &&
+            (typeof record.tlsScore === "number" || typeof record.tlsScore === "undefined") &&
+            (typeof record.tlsValidFrom === "string" ||
+                typeof record.tlsValidFrom === "undefined") &&
+            (typeof record.tlsValidTo === "string" || typeof record.tlsValidTo === "undefined") &&
+            (typeof record.tlsDaysRemaining === "number" ||
+                typeof record.tlsDaysRemaining === "undefined")
+        );
+    }
+
+    public getReport(engineState: EngineState): Report {
+        const state = this.getState(engineState);
+        const items = [];
+        if (typeof state.tlsGrade === "string") {
+            items.push({
+                key: "tlsGrade",
+                label: "Grade",
+                value: state.tlsGrade,
+            });
+        }
+        if (typeof state.tlsScore === "number") {
+            items.push({
+                key: "tlsScore",
+                label: "Score",
+                value: state.tlsScore,
+            });
+        }
+        if (typeof state.tlsValidFrom === "string") {
+            items.push({
+                key: "tlsValidFrom",
+                label: "Valid From",
+                value: state.tlsValidFrom,
+            });
+        }
+        if (typeof state.tlsValidTo === "string") {
+            items.push({
+                key: "tlsValidTo",
+                label: "Valid To",
+                value: state.tlsValidTo,
+            });
+        }
+        if (typeof state.tlsDaysRemaining === "number") {
+            items.push({
+                key: "tlsDaysRemaining",
+                label: "Days Remaining",
+                value: state.tlsDaysRemaining,
+            });
+        }
+
+        return {
+            plugin: this.name,
+            label: "TLS",
+            items,
+        };
     }
 }

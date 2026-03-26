@@ -245,11 +245,6 @@ export type EngineState = {
     any: Record<string, unknown>;
     findings: Finding[];
     inventory: InventoryItem[];
-    tlsGrade?: string;
-    tlsScore?: number;
-    tlsValidFrom?: string;
-    tlsValidTo?: string;
-    tlsDaysRemaining?: number;
     ipV4Supported?: boolean;
     ipV6Supported?: boolean;
     ipV4Reachable?: boolean;

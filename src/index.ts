@@ -228,7 +228,6 @@ async function main() {
     const durationMs = endedAt.getTime() - state.startedAt.getTime();
 
     if (outputFormat === "table" || outputFormat === "both") {
-        const tlsGrade = `${state.tlsGrade ?? "N/A"} (${state.tlsScore ?? "N/A"}%)`;
         const ipv4 = `supported ${TextUtils.statusLabel(state.ipV4Supported)} | reachable ${TextUtils.statusLabel(state.ipV4Reachable)} `;
         const ipv6 = `supported ${TextUtils.statusLabel(state.ipV6Supported)} | reachable ${TextUtils.statusLabel(state.ipV6Reachable)} `;
         console.log("\n\n=== Audit completed ===\n");
@@ -239,10 +238,6 @@ async function main() {
         console.log(`  - Stop requested   : ${state.stopRequested ? "✔ yes" : "✖ no"}`);
         console.log(`  - Stop confirmed   : ${state.stopConfirmedAt ?? ""}`);
         console.log(`  - URLs seen        : ${state.seen.size}`);
-        console.log(`  - TLS              : ${tlsGrade}`);
-        console.log(`    - Valid from     : ${state.tlsValidFrom}`);
-        console.log(`    - Valid to       : ${state.tlsValidTo}`);
-        console.log(`    - Days remaining : ${state.tlsDaysRemaining}`);
         console.log(`  - IPv4             : ${ipv4}`);
         console.log(`  - IPv6             : ${ipv6}`);
         for (const reportIndex in reports) {
@@ -250,6 +245,7 @@ async function main() {
             if (report.items.length === 0) {
                 continue;
             }
+            console.log(` - ${report.label} (${report.plugin})`);
             for (const itemIndex in report.items) {
                 const item = report.items[itemIndex];
                 console.log(`   - ${item.label} : ${item.value}`);
@@ -267,11 +263,6 @@ async function main() {
             stopConfirmedAt: state.stopConfirmedAt ?? null,
             origin: state.origin,
             seenCount: state.seen.size,
-            tlsGrade: state.tlsGrade ?? null,
-            tlsScore: state.tlsScore ?? null,
-            tlsValidFrom: state.tlsValidFrom ?? null,
-            tlsValidTo: state.tlsValidTo ?? null,
-            tlsDaysRemaining: state.tlsDaysRemaining ?? null,
             ipV4Supported: state.ipV4Supported ?? null,
             ipV6Supported: state.ipV6Supported ?? null,
             ipV4Reachable: state.ipV4Reachable ?? null,
