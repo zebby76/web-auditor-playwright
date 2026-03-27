@@ -246,6 +246,8 @@ Examples:
 | html-processor     | TITLE_BRAND_DUPLICATED     | Brand duplicated                                                  | SEO             | Fix                 |
 | html-processor     | TITLE_MAIN_TOO_SHORT       | Main part too short                                               | SEO             | Improve             |
 | html-processor     | TITLE_TOO_MANY_PARTS       | Too many segments                                                 | SEO             | Simplify            |
+| soft-http-error    | SOFT_404_DETECTED          | Page looks like a soft 404 while returning a successful HTTP code | Webmaster       | Fix status or page  |
+| soft-http-error    | SOFT_500_DETECTED          | Page looks like a soft 500 while returning a successful HTTP code | Webmaster       | Fix status or page  |
 
 ### URL / Crawl
 

@@ -138,6 +138,8 @@ export type FindingCode =
     | "NOT_PARSABLE_URL"
     | "STANDARD_URL_NOT_ENQUEUED"
     | "STANDARD_URL_MISSING"
+    | "SOFT_404_DETECTED"
+    | "SOFT_500_DETECTED"
     // Content extraction
     | "TEXT_EXTRACTION_FAILED"
     | "TEXT_EXTRACTION_SKIPPED_TOO_LARGE"
