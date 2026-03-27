@@ -32,6 +32,48 @@ import { TextUtils } from "./utils/TextUtils.js";
 import { XlsxExporter } from "./reporting/XlsxExporter.js";
 import { Report } from "./engine/types.js";
 
+function buildSitemapXml(urls: string[]): string {
+    const lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ...urls.map((url) => `  <url><loc>${escapeXml(url)}</loc></url>`),
+        "</urlset>",
+    ];
+
+    return `${lines.join("\n")}\n`;
+}
+
+function collectValidSitemapUrls(inventory: Array<{ url: string; status?: number }>): string[] {
+    const uniqueUrls = new Set<string>();
+
+    for (const entry of inventory) {
+        if (typeof entry.status !== "number" || entry.status >= 400) {
+            continue;
+        }
+
+        try {
+            const parsed = new URL(entry.url);
+            if (parsed.protocol !== "http:" && parsed.protocol != "https:") {
+                continue;
+            }
+            uniqueUrls.add(parsed.href);
+        } catch {
+            continue;
+        }
+    }
+
+    return [...uniqueUrls].sort((a, b) => a.localeCompare(b));
+}
+
+function escapeXml(value: string): string {
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+}
+
 async function main() {
     const reportOutputDir = process.env.REPORT_OUTPUT_DIR ?? "./reports";
     const websiteId = process.env.WEBSITE_ID ?? "my_website";
@@ -302,6 +344,13 @@ async function main() {
         console.log(jsonReport);
     }
     await fs.writeFile(path.join(reportOutputDir, `${websiteId}.json`), jsonReport, "utf-8");
+
+    const sitemapUrls = collectValidSitemapUrls(state.inventory);
+    await fs.writeFile(
+        path.join(reportOutputDir, `${websiteId}.xml`),
+        buildSitemapXml(sitemapUrls),
+        "utf-8",
+    );
 
     const xlsxExporter = new XlsxExporter({
         outputPath: path.join(reportOutputDir, `${websiteId}.xlsx`),
