@@ -37,6 +37,8 @@ async function main() {
     const websiteId = process.env.WEBSITE_ID ?? "my_website";
     const urlAllowlist = TextUtils.parseRegexList(process.env.URL_ALLOWLIST_REGEX);
     const urlBlocklist = TextUtils.parseRegexList(process.env.URL_BLOCKLIST_REGEX);
+    const soft404Patterns = TextUtils.parseRegexList(process.env.SOFT_404_PATTERNS);
+    const soft500Patterns = TextUtils.parseRegexList(process.env.SOFT_500_PATTERNS);
     const findingCodesBlocklist = (process.env.FINDING_CODES_BLOCKLIST ?? "")
         .split(",")
         .map((tag) => tag.trim())
@@ -92,7 +94,12 @@ async function main() {
             }),
         )
         .register(new HtmlProcessorPlugin())
-        .register(new SoftHttpErrorPlugin())
+        .register(
+            new SoftHttpErrorPlugin({
+                soft404Patterns: soft404Patterns.length > 0 ? soft404Patterns : undefined,
+                soft500Patterns: soft500Patterns.length > 0 ? soft500Patterns : undefined,
+            }),
+        )
         .register(
             new A11yAxePlugin({
                 relevantTags: (process.env.A11Y_AXE_RELEVANT_TAGS ?? "EN-301-549,best-practice")
