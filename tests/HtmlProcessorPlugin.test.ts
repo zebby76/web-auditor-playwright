@@ -6,11 +6,14 @@ import { HtmlProcessorPlugin } from "../src/plugins/HtmlProcessorPlugin.js";
 type ValidateSpecialHref = (href: string) => { code: string; message: string } | null;
 
 function createValidator(): ValidateSpecialHref {
-    const plugin = new HtmlProcessorPlugin() as HtmlProcessorPlugin & {
-        validateSpecialHref: ValidateSpecialHref;
-    };
+    const plugin = new HtmlProcessorPlugin();
+    const candidate = (plugin as unknown as Record<string, unknown>)["validateSpecialHref"];
 
-    return plugin.validateSpecialHref.bind(plugin);
+    if (typeof candidate !== "function") {
+        throw new Error("validateSpecialHref is not accessible in tests");
+    }
+
+    return candidate.bind(plugin) as ValidateSpecialHref;
 }
 
 test("validateSpecialHref accepts valid mailto hrefs", () => {
