@@ -73,7 +73,6 @@ The tool can be configured using [environment variables](#environment-variables)
 - Stats by locales
 - Tests runner's IPs like https://ipv4.icanhazip.com/ and https://ipv6.icanhazip.com/
 - hreflang
-- Soft 404
 - Analyse text's complexity (something like [Scolarius](https://www.scolarius.com/))
 - JSON-LD structure
     - `@context": "https://schema.org"`
