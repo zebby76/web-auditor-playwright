@@ -12,6 +12,7 @@ import { A11yAxePlugin } from "./plugins/A11yAxePlugin.js";
 import { StatsCollectorPlugin } from "./plugins/StatsCollectorPlugin.js";
 import { ConsoleStatusPlugin } from "./plugins/ConsoleStatusPlugin.js";
 import { SaveReportAsJsonPlugin } from "./plugins/SaveReportAsJsonPlugin.js";
+import { SiteDumpPlugin } from "./plugins/SiteDumpPlugin.js";
 import { HtmlProcessorPlugin } from "./plugins/HtmlProcessorPlugin.js";
 import { SeoUrlRulesPlugin } from "./plugins/SeoUrlRulesPlugin.js";
 import { SoftHttpErrorPlugin } from "./plugins/SoftHttpErrorPlugin.js";
@@ -113,6 +114,7 @@ async function main() {
     const urlBlocklist = TextUtils.parseRegexList(process.env.URL_BLOCKLIST_REGEX);
     const soft404Patterns = TextUtils.parseRegexList(process.env.SOFT_404_PATTERNS);
     const soft500Patterns = TextUtils.parseRegexList(process.env.SOFT_500_PATTERNS);
+    const dumpDir = process.env.DUMP_DIR?.trim() || null;
     const findingCodesBlocklist = (process.env.FINDING_CODES_BLOCKLIST ?? "")
         .split(",")
         .map((tag) => tag.trim())
@@ -265,6 +267,9 @@ async function main() {
         .register(new StandardUrlsAuditPlugin())
         .register(new CleanDownloadedPlugin());
 
+    if (dumpDir) {
+        registry.register(new SiteDumpPlugin({ outputDir: dumpDir }));
+    }
     if (process.env.DOWNLOAD_ENABLE_TEXTRACT_FALLBACK ?? "true") {
         registry.register(
             new TextractExtractorPlugin({
