@@ -168,7 +168,11 @@ async function main() {
             }),
         )
         .register(new HtmlProcessorPlugin())
-        .register(new SeoUrlRulesPlugin())
+        .register(
+            new SeoUrlRulesPlugin({
+                maxUrlLength: Number(process.env.MAX_URL_LENGTH ?? 120),
+            }),
+        )
         .register(
             new SoftHttpErrorPlugin({
                 soft404Patterns: soft404Patterns.length > 0 ? soft404Patterns : undefined,
