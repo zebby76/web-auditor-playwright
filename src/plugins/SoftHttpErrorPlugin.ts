@@ -24,6 +24,13 @@ const DEFAULT_SOFT_404_PATTERNS = [
     /\bpage requested could not be found\b/i,
     /\bdoes not exist\b/i,
     /\bno results found\b/i,
+    /\bseite nicht gefunden\b/i,
+    /\bnicht gefunden\b/i,
+    /\bdiese seite existiert nicht\b/i,
+    /\bpagina niet gevonden\b/i,
+    /\bniet gevonden\b/i,
+    /\bdeze pagina bestaat niet\b/i,
+    /\bgeen resultaten gevonden\b/i,
 ];
 
 const DEFAULT_SOFT_500_PATTERNS = [
@@ -36,6 +43,14 @@ const DEFAULT_SOFT_500_PATTERNS = [
     /\bune erreur est survenue\b/i,
     /\berreur interne du serveur\b/i,
     /\bincident technique\b/i,
+    /\binterner serverfehler\b/i,
+    /\bserverfehler\b/i,
+    /\bein technischer fehler ist aufgetreten\b/i,
+    /\bdienst nicht verfugb?ar\b/i,
+    /\binterne serverfout\b/i,
+    /\bserverfout\b/i,
+    /\beer is een technische fout opgetreden\b/i,
+    /\bdienst niet beschikbaar\b/i,
 ];
 
 export class SoftHttpErrorPlugin extends BasePlugin implements IPlugin {
