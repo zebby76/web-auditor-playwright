@@ -43,17 +43,22 @@ function buildSitemapXml(urls: string[]): string {
     return `${lines.join("\n")}\n`;
 }
 
-function collectValidSitemapUrls(inventory: Array<{ url: string; status?: number }>): string[] {
+function collectValidSitemapUrls(
+    inventory: Array<{ url: string; status?: number; mime?: string }>,
+): string[] {
     const uniqueUrls = new Set<string>();
 
     for (const entry of inventory) {
         if (typeof entry.status !== "number" || entry.status >= 400) {
             continue;
         }
+        if (!isSitemapEligibleMime(entry.mime)) {
+            continue;
+        }
 
         try {
             const parsed = new URL(entry.url);
-            if (parsed.protocol !== "http:" && parsed.protocol != "https:") {
+            if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
                 continue;
             }
             uniqueUrls.add(parsed.href);
@@ -63,6 +68,33 @@ function collectValidSitemapUrls(inventory: Array<{ url: string; status?: number
     }
 
     return [...uniqueUrls].sort((a, b) => a.localeCompare(b));
+}
+
+function isSitemapEligibleMime(mime: string | undefined): boolean {
+    if (!mime) {
+        return false;
+    }
+
+    if (mime.includes("text/html")) {
+        return true;
+    }
+
+    return [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "application/rtf",
+        "text/rtf",
+        "application/vnd.oasis.opendocument.text",
+        "application/vnd.oasis.opendocument.spreadsheet",
+        "application/vnd.oasis.opendocument.presentation",
+        "text/plain",
+        "text/csv",
+    ].includes(mime);
 }
 
 function escapeXml(value: string): string {
