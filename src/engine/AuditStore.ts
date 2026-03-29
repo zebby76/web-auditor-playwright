@@ -26,13 +26,13 @@ export class AuditStore {
         this.db.exec(sql);
     }
 
-    public createRun(input: { websiteId: string; startUrl: string }): number {
+    public createRun(input: { startUrl: string }): number {
         const stmt = this.db.prepare(`
-      INSERT INTO crawl_runs (website_id, start_url, started_at, status)
-      VALUES (?, ?, ?, 'running')
+      INSERT INTO crawl_runs (start_url, started_at, status)
+      VALUES (?, ?, 'running')
     `);
 
-        const result = stmt.run(input.websiteId, input.startUrl, new Date().toISOString());
+        const result = stmt.run(input.startUrl, new Date().toISOString());
 
         return Number(result.lastInsertRowid);
     }
