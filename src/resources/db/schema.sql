@@ -3,7 +3,6 @@ PRAGMA synchronous = NORMAL;
 
 CREATE TABLE IF NOT EXISTS crawl_runs (
                                           id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                          website_id TEXT NOT NULL,
                                           start_url TEXT NOT NULL,
                                           started_at TEXT NOT NULL,
                                           finished_at TEXT,
