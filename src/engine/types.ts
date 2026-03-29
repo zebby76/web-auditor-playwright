@@ -297,8 +297,6 @@ export type EngineState = {
     activeWorkers: number;
     maxPages: number;
     any: Record<string, unknown>;
-    findings: Finding[];
-    inventory: InventoryItem[];
     stopRequested: boolean;
     stopConfirmedAt?: string;
 };

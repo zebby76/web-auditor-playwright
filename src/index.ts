@@ -33,6 +33,7 @@ import { IpSupportPlugin } from "./plugins/IpSupportPlugin.js";
 import { TextUtils } from "./utils/TextUtils.js";
 import { XlsxExporter } from "./reporting/XlsxExporter.js";
 import { Report } from "./engine/types.js";
+import { AuditStore } from "./engine/AuditStore.js";
 
 function buildSitemapXml(urls: string[]): string {
     const lines = [
@@ -315,6 +316,12 @@ async function main() {
     }
     const endedAt = new Date();
     const durationMs = endedAt.getTime() - state.startedAt.getTime();
+    const auditStore = new AuditStore(path.join(reportOutputDir, websiteId, "audit.db"));
+    const runId = Number(state.any["runId"]);
+    const issues = auditStore
+        .getFindings(runId)
+        .filter((finding) => !findingCodesBlocklist.includes(finding.code));
+    const inventory = auditStore.getInventory(runId);
 
     const pluginSummaries = registry.getSummaries();
     const engineReport = {
@@ -379,8 +386,8 @@ async function main() {
     const globalReport = {
         reports,
         plugins: pluginSummaries,
-        issues: state.findings.filter((f) => !findingCodesBlocklist.includes(f.code)),
-        inventory: state.inventory,
+        issues,
+        inventory,
     };
     const jsonReport = JSON.stringify(globalReport, null, 4);
     if (outputFormat === "json" || outputFormat === "both") {
@@ -388,7 +395,7 @@ async function main() {
     }
     await fs.writeFile(path.join(reportOutputDir, websiteId, "report.json"), jsonReport, "utf-8");
 
-    const sitemapUrls = collectValidSitemapUrls(state.inventory);
+    const sitemapUrls = collectValidSitemapUrls(inventory);
     await fs.writeFile(
         path.join(reportOutputDir, websiteId, "sitemap.xml"),
         buildSitemapXml(sitemapUrls),

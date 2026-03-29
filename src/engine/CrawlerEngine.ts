@@ -52,13 +52,12 @@ export class CrawlerEngine {
             activeWorkers: 0,
             maxPages: this.opts.maxPages,
             any: {},
-            findings: [],
-            inventory: [],
             stopRequested: false,
         };
         this.currentState = state;
 
         const runId = this.store.createRun({ startUrl: start });
+        state.any["runId"] = runId;
         this.enqueueUrl({ url: start, depth: 0, source: "engine:start" }, runId, state, start);
 
         const browser = await chromium.launch({ headless: true });
@@ -243,13 +242,6 @@ export class CrawlerEngine {
 
                 await page.close();
                 ctx.report.auditors = ctx.auditors;
-                state.findings.push(...ctx.findings);
-                state.inventory.push({
-                    depth: ctx.depth,
-                    mime: ctx.downloaded?.mime ?? ctx.report.mimetype ?? ctx.mime,
-                    status: ctx.status,
-                    url: ctx.report.url ?? ctx.finalUrl ?? ctx.url,
-                });
                 await this.registry.runPhase("finally", ctx);
 
                 if (!failedInStore) {

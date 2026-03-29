@@ -197,4 +197,76 @@ export class AuditStore {
             )
             .all(runId) as Array<{ code: string; severity: string; count: number }>;
     }
+
+    public getFindings(runId: number): Array<{
+        plugin: string;
+        type: string;
+        category: string;
+        code: string;
+        message: string;
+        url?: string;
+        data?: unknown;
+    }> {
+        const rows = this.db
+            .prepare(
+                `
+      SELECT plugin, severity, category, code, message, resource_url, payload_json
+      FROM findings
+      WHERE run_id = ?
+      ORDER BY id ASC
+    `,
+            )
+            .all(runId) as Array<{
+            plugin: string;
+            severity: string;
+            category: string | null;
+            code: string;
+            message: string;
+            resource_url: string | null;
+            payload_json: string | null;
+        }>;
+
+        return rows.map((row) => ({
+            plugin: row.plugin,
+            type: row.severity,
+            category: row.category ?? "",
+            code: row.code,
+            message: row.message,
+            url: row.resource_url ?? undefined,
+            data: row.payload_json ? JSON.parse(row.payload_json) : undefined,
+        }));
+    }
+
+    public getInventory(runId: number): Array<{
+        depth?: number;
+        mime?: string;
+        status?: number;
+        url: string;
+    }> {
+        return this.db
+            .prepare(
+                `
+      SELECT depth, content_type, http_status, url
+      FROM urls
+      WHERE run_id = ? AND visited_at IS NOT NULL
+      ORDER BY id ASC
+    `,
+            )
+            .all(runId)
+            .map((row) => {
+                const inventoryRow = row as {
+                    depth: number | null;
+                    content_type: string | null;
+                    http_status: number | null;
+                    url: string;
+                };
+
+                return {
+                    depth: inventoryRow.depth ?? undefined,
+                    mime: inventoryRow.content_type ?? undefined,
+                    status: inventoryRow.http_status ?? undefined,
+                    url: inventoryRow.url,
+                };
+            });
+    }
 }
