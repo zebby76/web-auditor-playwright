@@ -134,7 +134,7 @@ async function main() {
         )
         .register(
             new SaveReportAsJsonPlugin({
-                outputDir: path.join(reportOutputDir, websiteId),
+                outputDir: path.join(reportOutputDir, websiteId, "pages"),
             }),
         )
         .register(
@@ -385,17 +385,17 @@ async function main() {
     if (outputFormat === "json" || outputFormat === "both") {
         console.log(jsonReport);
     }
-    await fs.writeFile(path.join(reportOutputDir, `${websiteId}.json`), jsonReport, "utf-8");
+    await fs.writeFile(path.join(reportOutputDir, websiteId, "report.json"), jsonReport, "utf-8");
 
     const sitemapUrls = collectValidSitemapUrls(state.inventory);
     await fs.writeFile(
-        path.join(reportOutputDir, `${websiteId}.xml`),
+        path.join(reportOutputDir, websiteId, "sitemap.xml"),
         buildSitemapXml(sitemapUrls),
         "utf-8",
     );
 
     const xlsxExporter = new XlsxExporter({
-        outputPath: path.join(reportOutputDir, `${websiteId}.xlsx`),
+        outputPath: path.join(reportOutputDir, websiteId, "report.xlsx"),
     });
     await xlsxExporter.export(globalReport);
 
