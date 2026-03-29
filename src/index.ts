@@ -332,7 +332,7 @@ async function main() {
         .filter((finding) => !findingCodesBlocklist.includes(finding.code));
     const inventory = auditStore.getInventory(runId);
 
-    const pluginSummaries = registry.getSummaries();
+    const pluginSummaries = registry.getSummaries(state);
     const engineReport = {
         plugin: "engine",
         label: "Crawler",

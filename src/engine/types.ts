@@ -359,6 +359,13 @@ export type Report = {
     items: ReportItem[];
 };
 
+export type BaseState = {
+    treatedUrls: number;
+    infos: number;
+    warnings: number;
+    errors: number;
+};
+
 export type PluginSummary = {
     plugin: string;
     treatedUrls: number;
@@ -374,5 +381,6 @@ export interface IPlugin {
     run(phase: PluginPhase, ctx: ResourceContext): Promise<void>;
     includeInSummary?(): boolean;
     getSummary?(): PluginSummary | null;
+    hydrateFromState?(engineState: EngineState): void;
     getReport?(engineState: EngineState): Report;
 }
