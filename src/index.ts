@@ -307,7 +307,6 @@ async function main() {
     });
 
     stopController.start();
-    engine.init();
     let state;
     try {
         state = await engine.run();

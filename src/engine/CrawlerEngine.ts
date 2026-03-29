@@ -21,12 +21,15 @@ export class CrawlerEngine {
     private readonly rateLimiter: RateLimiter;
     private stopRequested = false;
     private currentState?: EngineState;
+    private store: AuditStore;
 
     constructor(
         private opts: CrawlOptions,
         private registry: PluginRegistry,
     ) {
         this.rateLimiter = new RateLimiter(this.opts.rateLimitMs);
+        this.store = new AuditStore(path.join(this.opts.reportDir, "audit.db"));
+        this.store.initSchema();
     }
 
     async run(): Promise<EngineState> {
