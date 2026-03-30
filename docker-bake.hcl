@@ -7,7 +7,7 @@ variable "VERSION" {
 }
 
 variable "DOCKER_IMAGE_NAME" {
-  default = "elasticms/web-auditor"
+  default = "zebby76/web-auditor"
 }
 
 variable "DOCKER_IMAGE_TAG" {
