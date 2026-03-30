@@ -145,9 +145,9 @@ jobs:
           set: |
             *.tags=
             *.platform=${{ matrix.platform }}
-            cache-from=type=gha,scope=${{ needs.prepare.outputs.ref || github.ref }}-${{ matrix.platform }}
-            cache-from=type=gha,scope=refs/heads/main-prd-${{ matrix.platform }}
-            cache-to=type=gha,scope=${{ needs.prepare.outputs.ref || github.ref }}-${{ matrix.platform }},ignore-error=true
+            *.cache-from=type=gha,scope=${{ needs.prepare.outputs.ref || github.ref }}-${{ matrix.platform }}
+            *.cache-from=type=gha,scope=refs/heads/main-prd-${{ matrix.platform }}
+            *.cache-to=type=gha,scope=${{ needs.prepare.outputs.ref || github.ref }}-${{ matrix.platform }},ignore-error=true
             ${{ fromJson(needs.prepare.outputs.push) && format('*.output=type=image,name={0},push-by-digest=true,name-canonical=true,push=true', env.DOCKER_IMAGE_NAME) || '' }}
         env:
           GIT_HASH: ${{ github.sha }}
